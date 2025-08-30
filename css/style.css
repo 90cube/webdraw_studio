@@ -185,6 +185,18 @@ body, html {
     border-top-right-radius: 6px;
 }
 
+.canvas-tooltip {
+    position: absolute;
+    z-index: 1100;
+    background-color: #3c4049;
+    color: #e8eaed;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    pointer-events: none; /* Tooltip should not be interactive */
+    white-space: nowrap;
+}
+
 .file {
     cursor: pointer;
     color: #bdc1c6;
@@ -194,9 +206,52 @@ body, html {
     text-decoration: underline;
 }
 
+/* Parameters Panel Specific Styles */
+#panel-parameters .panel-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Add space between tool groups */
+    padding: 10px;
+}
+
+#panel-parameters .tool-group {
+    padding-bottom: 15px;
+    border-bottom: 1px solid #5f6368; /* Separator line */
+}
+
+#panel-parameters .tool-group:last-child {
+    border-bottom: none;
+}
+
+#panel-parameters input[type="number"],
+#panel-parameters input[type="text"] {
+    background-color: #3c4049;
+    border: 1px solid #5f6368;
+    color: #e8eaed;
+    padding: 8px;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#panel-parameters input[type="checkbox"] {
+    accent-color: #8ab4f8; /* Modern checkbox color */
+    width: 16px;
+    height: 16px;
+}
+
+#panel-parameters label {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Space between checkbox/label text */
+}
+
+
 .tool-group h4 {
-    margin: 0 0 5px 0;
+    margin: 0 0 10px 0; /* Adjusted margin */
     font-size: 13px;
+    font-weight: 600;
+    color: #bdc1c6;
 }
 .btn {
     background: #5f6368; color: white; border: 1px solid #80868b; padding: 5px 10px; margin: 2px; border-radius: 4px; cursor: pointer; font-size: 12px;
@@ -423,7 +478,7 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 1500px; /* 300px -> 1500px */
+    width: 1320px; /* 1500px -> 1320px */
     height: 480px; /* 600px -> 480px */
 }
 
@@ -433,7 +488,7 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
 }
 
 .prompt-inputs-section {
-    flex: 3; /* Takes 3/4 of space */
+    flex: 7; /* 3 -> 7 */
     padding-right: 10px;
     overflow-y: auto;
 }
@@ -444,9 +499,9 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
     border-left: 1px solid #5f6368;
     display: flex;
     flex-direction: row; /* 세로 정렬을 위해 row로 변경 */
-    justify-content: space-around; /* 좌우 정렬 */
+    justify-content: center; /* 중앙 정렬 */
     align-items: center; /* 상하 정렬 */
-    gap: 15px;
+    gap: 40px; /* 슬라이더 간의 간격 조정 */
 }
 
 .vertical-slider-group {
@@ -457,13 +512,61 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
 }
 
 .vertical-slider-group input[type="range"] {
-    appearance: none; /* 기본 스타일 제거 */
-    -webkit-appearance: none; /* Webkit 브라우저용 기본 스타일 제거 */
-    writing-mode: vertical-lr; /* 슬라이더를 세로로 */
-    direction: rtl; /* 슬라이더 방향 반전 */
+    -webkit-appearance: none; /* 기본 스타일 제거 */
+    appearance: none;
+    background: transparent; /* 배경 제거 */
+    cursor: pointer;
+    writing-mode: vertical-lr;
+    direction: rtl;
+    width: 20px; /* 전체 너비 */
+    height: 150px; /* 전체 높이 */
+}
+
+/* Chrome, Safari, Edge 용 트랙 스타일 */
+.vertical-slider-group input[type="range"]::-webkit-slider-runnable-track {
+    background: #3c4049;
+    height: 6px;
+    border-radius: 3px;
+    border: 1px solid #5f6368;
+}
+
+/* Chrome, Safari, Edge 용 손잡이(thumb) 스타일 */
+.vertical-slider-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    margin-right: -7px; /* 트랙 중앙 정렬 */
+    background-color: #e8eaed;
+    height: 20px;
     width: 20px;
-    height: 120px;
-    padding: 0 5px;
+    border-radius: 50%;
+    border: 2px solid #5f6368;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.vertical-slider-group input[type="range"]:hover::-webkit-slider-thumb {
+    background-color: #8ab4f8;
+}
+
+/* Firefox 용 트랙 스타일 */
+.vertical-slider-group input[type="range"]::-moz-range-track {
+    background: #3c4049;
+    height: 6px;
+    border-radius: 3px;
+    border: 1px solid #5f6368;
+}
+
+/* Firefox 용 손잡이(thumb) 스타일 */
+.vertical-slider-group input[type="range"]::-moz-range-thumb {
+    background-color: #e8eaed;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    border: 2px solid #5f6368;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.vertical-slider-group input[type="range"]:hover::-moz-range-thumb {
+    background-color: #8ab4f8;
 }
 
 .execution-controls-section input[type="range"] {

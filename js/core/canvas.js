@@ -6,11 +6,22 @@ export function initCanvas() {
     fabric.Object.customProperties.push('imageMode');
 
     const imageModes = {
-        'image': { name: '이미지 (I2I)', lock: false, badge: { letter: 'I', color: '#4285F4' } },
-        'mask': { name: '마스크', lock: false, badge: { letter: 'M', color: '#DB4437' } },
-        'preprocessor': { name: '전처리 소스', lock: false, badge: { letter: 'P', color: '#F4B400' } },
-        'controlnet': { name: '컨트롤넷 소스', lock: false, badge: { letter: 'C', color: '#0F9D58' } },
-        'reference': { name: '참조 (잠금)', lock: true, badge: { letter: 'R', color: '#757575' } },
+        'image': { name: '이미지 (I2I)', lock: false },
+        'mask': { name: '마스크', lock: false },
+        'preprocessor': { name: '전처리 소스', lock: false },
+        'controlnet': { name: '컨트롤넷 소스', lock: false },
+        'reference': { name: '참조 (잠금)', lock: true },
+    };
+
+    const canvasContextMenuActions = {
+        'temp1': {
+            name: '임시 컨텍스트 1',
+            action: () => console.log('임시 컨텍스트 1 실행')
+        },
+        'temp2': {
+            name: '임시 컨텍스트 2',
+            action: () => console.log('임시 컨텍스트 2 실행')
+        }
     };
 
     function updateObjectLock(target) {
@@ -36,6 +47,36 @@ export function initCanvas() {
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
+
+    // --- Drag and Drop --- 
+    const canvasContainer = document.getElementById('canvas-container');
+    canvasContainer.addEventListener('dragover', function(e) {
+        e.preventDefault();
+    }, false);
+
+    canvasContainer.addEventListener('drop', function(e) {
+        e.preventDefault();
+        const file = e.dataTransfer.files[0];
+        if (!file || !file.type.startsWith('image/')) return;
+
+        const reader = new FileReader();
+        reader.onload = function(f) {
+            const data = f.target.result;
+            fabric.Image.fromURL(data, function(img) {
+                // Center the image on the canvas
+                const canvasCenter = canvas.getCenter();
+                img.set({
+                    left: canvasCenter.left,
+                    top: canvasCenter.top,
+                    originX: 'center',
+                    originY: 'center'
+                });
+                canvas.add(img);
+                canvas.renderAll();
+            });
+        };
+        reader.readAsDataURL(file);
+    });
 
     const rect = new fabric.Rect({ left: 100, top: 100, fill: 'red', width: 200, height: 200, angle: 45 });
     rect.set('imageMode', 'image');
@@ -85,67 +126,103 @@ export function initCanvas() {
         }
     });
 
+    // --- Object Hover Tooltip ---
+    let objectTooltip = null;
+    canvas.on('mouse:over', function(e) {
+        const target = e.target;
+        if (!target) return;
+
+        if (objectTooltip) objectTooltip.remove();
+
+        const mode = target.imageMode || 'image';
+        const modeName = imageModes[mode]?.name || 'Unknown';
+
+        objectTooltip = document.createElement('div');
+        objectTooltip.className = 'canvas-tooltip';
+        objectTooltip.textContent = modeName;
+        document.body.appendChild(objectTooltip);
+
+        objectTooltip.style.left = `${e.e.pageX + 15}px`;
+        objectTooltip.style.top = `${e.e.pageY + 15}px`;
+    });
+
+    canvas.on('mouse:move', function(e) {
+        if (objectTooltip) {
+            objectTooltip.style.left = `${e.e.pageX + 15}px`;
+            objectTooltip.style.top = `${e.pageY + 15}px`;
+        }
+    });
+
+    canvas.on('mouse:out', function(e) {
+        if (objectTooltip) {
+            objectTooltip.remove();
+            objectTooltip = null;
+        }
+    });
+
     // --- Context Menu ---
     canvas.on('mouse:dblclick', function(opt) {
-        const target = opt.target;
-        if (!target) return;
         opt.e.preventDefault();
         opt.e.stopPropagation();
+        const target = opt.target;
         const menu = document.getElementById('context-menu');
         const menuList = menu.querySelector('ul');
-        menuList.innerHTML = '';
-        const imageModeLi = document.createElement('li');
-        imageModeLi.classList.add('has-submenu');
-        imageModeLi.innerHTML = `<span>Image Mode</span>`;
-        const subMenuUl = document.createElement('ul');
-        subMenuUl.classList.add('submenu');
-        Object.entries(imageModes).forEach(([key, {name}]) => {
-            const subLi = document.createElement('li');
-            subLi.textContent = name;
-            subLi.dataset.mode = key;
-            subMenuUl.appendChild(subLi);
-        });
-        imageModeLi.appendChild(subMenuUl);
-        menuList.appendChild(imageModeLi);
+        menuList.innerHTML = ''; // Clear previous menu items
+
+        let menuItems = {};
+        let clickHandler = () => {};
+
+        if (target) {
+            // --- Object-specific context menu ---
+            const imageModeLi = document.createElement('li');
+            imageModeLi.classList.add('has-submenu');
+            imageModeLi.innerHTML = `<span>Image Mode</span>`;
+            const subMenuUl = document.createElement('ul');
+            subMenuUl.classList.add('submenu');
+            Object.entries(imageModes).forEach(([key, {name}]) => {
+                const subLi = document.createElement('li');
+                subLi.textContent = name;
+                subLi.dataset.mode = key;
+                subMenuUl.appendChild(subLi);
+            });
+            imageModeLi.appendChild(subMenuUl);
+            menuList.appendChild(imageModeLi);
+
+            clickHandler = (e) => {
+                const clickedLi = e.target.closest('li');
+                if (clickedLi && clickedLi.dataset.mode) {
+                    setObjectImageMode(target, clickedLi.dataset.mode);
+                }
+                menu.style.display = 'none';
+            };
+
+        } else {
+            // --- Canvas background context menu ---
+            menuItems = canvasContextMenuActions;
+            Object.entries(menuItems).forEach(([key, { name }]) => {
+                const li = document.createElement('li');
+                li.textContent = name;
+                li.dataset.action = key;
+                menuList.appendChild(li);
+            });
+
+            clickHandler = (e) => {
+                const clickedLi = e.target.closest('li');
+                if (clickedLi && clickedLi.dataset.action) {
+                    const action = menuItems[clickedLi.dataset.action]?.action;
+                    if (action) action();
+                }
+                menu.style.display = 'none';
+            };
+        }
+
         menu.style.left = `${opt.e.clientX}px`;
         menu.style.top = `${opt.e.clientY}px`;
         menu.style.display = 'block';
-        const menuClickHandler = (e) => {
-            const clickedLi = e.target.closest('li');
-            if (clickedLi && clickedLi.dataset.mode) {
-                setObjectImageMode(target, clickedLi.dataset.mode);
-            }
-            menu.style.display = 'none';
-        };
-        menu.addEventListener('click', menuClickHandler, { once: true });
+
+        menu.addEventListener('click', clickHandler, { once: true });
         const closeMenu = () => { menu.style.display = 'none'; window.removeEventListener('click', closeMenu); };
         setTimeout(() => window.addEventListener('click', closeMenu), 0);
-    });
-
-    // --- Badge Rendering ---
-    canvas.on('after:render', function() {
-        const activeObj = canvas.getActiveObject();
-        if (!activeObj) return;
-        const mode = activeObj.imageMode || 'image';
-        const badge = imageModes[mode]?.badge;
-        if (!badge) return;
-        const ctx = canvas.getContext();
-        ctx.save();
-        const zoom = canvas.getZoom();
-        const badgeSize = 18 / zoom;
-        const padding = 4 / zoom;
-        const offset = 48 / zoom;
-        const p = activeObj.getPointByOrigin('left', 'top');
-        p.x -= offset;
-        p.y -= offset;
-        ctx.fillStyle = badge.color;
-        ctx.fillRect(p.x, p.y, badgeSize + padding * 2, badgeSize + padding * 2);
-        ctx.fillStyle = 'white';
-        ctx.font = `${badgeSize}px sans-serif`;
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
-        ctx.fillText(badge.letter, p.x + padding, p.y + padding);
-        ctx.restore();
     });
 
     // --- Keyboard Listeners ---

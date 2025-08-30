@@ -47,9 +47,26 @@ function renderPresets(presets, container) {
 }
 
 function attachEventListeners() {
-    // ... (existing slider listeners)
+    const cfgSlider = panel.querySelector('#param-cfg');
+    const cfgValueSpan = panel.querySelector('#cfg-value');
+    const denoiseSlider = panel.querySelector('#param-denoise');
+    const denoiseValueSpan = panel.querySelector('#denoise-value');
 
-    // Preset-Kontext-Buttons
+    // CFG Slider Event Listener
+    cfgSlider.addEventListener('input', (e) => {
+        const value = parseInt(e.target.value);
+        cfgValueSpan.textContent = value;
+        state.setState('currentCFG', value);
+    });
+
+    // Denoise Slider Event Listener
+    denoiseSlider.addEventListener('input', (e) => {
+        const value = parseFloat(e.target.value);
+        denoiseValueSpan.textContent = value.toFixed(2);
+        state.setState('currentDenoise', value);
+    });
+
+    // Preset Buttons Event Listener (using event delegation)
     panel.addEventListener('click', e => {
         if (!e.target.classList.contains('preset-btn')) return;
 

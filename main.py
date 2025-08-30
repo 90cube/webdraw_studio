@@ -61,3 +61,22 @@ def get_vaes() -> List[Dict[str, Any]]:
             })
             
     return vaes
+
+@app.get("/api/models/loras")
+def get_loras() -> List[Dict[str, Any]]:
+    loras_dir = Path("models/lora")
+    allowed_extensions = [".safetensors", ".ckpt", ".pth"]
+    loras = []
+
+    for p in loras_dir.rglob("*"):
+        if p.is_file() and p.suffix.lower() in allowed_extensions:
+            image_path = next(p.parent.glob(f"{p.stem}.*['.png', '.jpg', '.jpeg', '.webp']"), None)
+            
+            loras.append({
+                "name": p.name,
+                "path": str(p).replace('\\', '/'),
+                "subfolder": str(p.parent.relative_to(loras_dir)).replace('\\', '/') if p.parent != loras_dir else "",
+                "preview_image": str(image_path).replace('\\', '/') if image_path else None
+            })
+            
+    return loras
