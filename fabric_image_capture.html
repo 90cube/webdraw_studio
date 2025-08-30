@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabric.js 이미지 캡처 도구</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+        
+        #canvas-container {
+            position: relative;
+            display: inline-block;
+            border: 2px solid #ccc;
+            background: white;
+        }
+        
+        #floating-tools {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            min-width: 200px;
+        }
+        
+        .tool-group {
+            margin-bottom: 15px;
+        }
+        
+        .tool-group h4 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            margin: 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        button.active {
+            background: #2196F3;
+        }
+        
+        select {
+            width: 100%;
+            padding: 4px;
+            margin: 2px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        #selection-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+            padding: 8px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        
+        .controls {
+            margin-bottom: 20px;
+        }
+        
+        .controls button {
+            margin-right: 10px;
+        }
+        
+        #captured-preview {
+            margin-top: 20px;
+            max-width: 300px;
+            border: 1px solid #ccc;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h2>Fabric.js + Stable Diffusion 영역 캡처 도구</h2>
+    
+    <div class="controls">
+        <button onclick="addSampleImages()">샘플 이미지 추가</button>
+        <button onclick="addSampleShapes()">샘플 도형 추가</button>
+        <button onclick="clearCanvas()">캔버스 지우기</button>
+    </div>
+    
+    <div id="canvas-container">
+        <canvas id="fabric-canvas" width="800" height="600"></canvas>
+        
+        <!-- 플로팅 UI 도구 -->
+        <div id="floating-tools">
+            <div class="tool-group">
+                <h4>선택 도구</h4>
+                <button id="selection-tool" class="active" onclick="setSelectionMode()">선택 모드</button>
+                <button id="rectangle-tool" onclick="setRectangleMode()">사각형 선택</button>
+            </div>
+            
+            <div class="tool-group">
+                <h4>Stable Diffusion 비율</h4>
+                <select id="aspect-ratio" onchange="updateSelectionConstraints()">
+                    <option value="free">자유 비율</option>
+                    <option value="512x512">1:1 (512x512)</option>
+                    <option value="512x768">2:3 (512x768)</option>
+                    <option value="768x512">3:2 (768x512)</option>
+                    <option value="512x1024">1:2 (512x1024)</option>
+                    <option value="1024x512">2:1 (1024x512)</option>
+                    <option value="1024x1024">1:1 (1024x1024)</option>
+                    <option value="768x1024">3:4 (768x1024)</option>
+                    <option value="1024x768">4:3 (1024x768)</option>
+                </select>
+            </div>
+            
+            <div class="tool-group">
+                <h4>캡처 & 붙여넣기</h4>
+                <button onclick="captureSelection()">영역 캡처</button>
+                <button onclick="pasteToCanvas()" id="paste-btn" disabled>캔버스에 붙여넣기</button>
+            </div>
+            
+            <div id="selection-info">
+                선택된 영역: 없음
+            </div>
+        </div>
+    </div>
+    
+    <img id="captured-preview" alt="캡처 미리보기">
+    
+    <script>
+        // Fabric.js 캔버스 초기화
+        const canvas = new fabric.Canvas('fabric-canvas', {
+            backgroundColor: '#ffffff'
+        });
+        
+        let currentMode = 'selection';
+        let isDrawing = false;
+        let rectangle = null;
+        let aspectRatioConstraint = 'free';
+        let capturedImageData = null;
+        
+        // 종횡비 설정
+        const aspectRatios = {
+            '512x512': { width: 512, height: 512 },
+            '512x768': { width: 512, height: 768 },
+            '768x512': { width: 768, height: 512 },
+            '512x1024': { width: 512, height: 1024 },
+            '1024x512': { width: 1024, height: 512 },
+            '1024x1024': { width: 1024, height: 1024 },
+            '768x1024': { width: 768, height: 1024 },
+            '1024x768': { width: 1024, height: 768 }
+        };
+        
+        // 8의 배수로 크기 조정
+        function roundToMultiple(value, multiple = 8) {
+            return Math.round(value / multiple) * multiple;
+        }
+        
+        // 선택 모드 설정
+        function setSelectionMode() {
+            currentMode = 'selection';
+            canvas.selection = true;
+            canvas.defaultCursor = 'default';
+            updateToolButtons();
+            clearSelectionRectangle();
+        }
+        
+        // 사각형 선택 모드 설정
+        function setRectangleMode() {
+            currentMode = 'rectangle';
+            canvas.selection = false;
+            canvas.defaultCursor = 'crosshair';
+            updateToolButtons();
+        }
+        
+        function updateToolButtons() {
+            document.getElementById('selection-tool').classList.toggle('active', currentMode === 'selection');
+            document.getElementById('rectangle-tool').classList.toggle('active', currentMode === 'rectangle');
+        }
+        
+        // 종횡비 제약 업데이트
+        function updateSelectionConstraints() {
+            aspectRatioConstraint = document.getElementById('aspect-ratio').value;
+        }
+        
+        // 선택 영역 정보 업데이트
+        function updateSelectionInfo(rect) {
+            const info = document.getElementById('selection-info');
+            if (rect) {
+                const width = Math.round(rect.width * rect.scaleX);
+                const height = Math.round(rect.height * rect.scaleY);
+                info.innerHTML = `
+                    선택 영역:<br>
+                    위치: (${Math.round(rect.left)}, ${Math.round(rect.top)})<br>
+                    크기: ${width} × ${height}px
+                `;
+            } else {
+                info.innerHTML = '선택된 영역: 없음';
+            }
+        }
+        
+        // 마우스 다운 이벤트
+        canvas.on('mouse:down', function(o) {
+            if (currentMode !== 'rectangle') return;
+            
+            const pointer = canvas.getPointer(o.e);
+            isDrawing = true;
+            
+            clearSelectionRectangle();
+            
+            rectangle = new fabric.Rect({
+                left: pointer.x,
+                top: pointer.y,
+                width: 0,
+                height: 0,
+                fill: 'rgba(0, 123, 255, 0.1)',
+                stroke: '#007bff',
+                strokeWidth: 2,
+                selectable: false,
+                evented: false,
+                strokeDashArray: [5, 5]
+            });
+            
+            canvas.add(rectangle);
+        });
+        
+        // 마우스 이동 이벤트
+        canvas.on('mouse:move', function(o) {
+            if (!isDrawing || currentMode !== 'rectangle') return;
+            
+            const pointer = canvas.getPointer(o.e);
+            let width = pointer.x - rectangle.left;
+            let height = pointer.y - rectangle.top;
+            
+            // 종횡비 제약 적용
+            if (aspectRatioConstraint !== 'free') {
+                const ratio = aspectRatios[aspectRatioConstraint];
+                const targetRatio = ratio.width / ratio.height;
+                
+                if (Math.abs(width / height) > targetRatio) {
+                    height = width / targetRatio;
+                } else {
+                    width = height * targetRatio;
+                }
+                
+                // 8의 배수로 조정
+                width = roundToMultiple(Math.abs(width));
+                height = roundToMultiple(Math.abs(height));
+            }
+            
+            rectangle.set({
+                width: Math.abs(width),
+                height: Math.abs(height)
+            });
+            
+            if (width < 0) {
+                rectangle.set({ left: pointer.x });
+            }
+            if (height < 0) {
+                rectangle.set({ top: pointer.y });
+            }
+            
+            canvas.renderAll();
+            updateSelectionInfo(rectangle);
+        });
+        
+        // 마우스 업 이벤트
+        canvas.on('mouse:up', function() {
+            isDrawing = false;
+        });
+        
+        // 선택 사각형 제거
+        function clearSelectionRectangle() {
+            if (rectangle) {
+                canvas.remove(rectangle);
+                rectangle = null;
+                updateSelectionInfo(null);
+            }
+        }
+        
+        // 선택 영역 캡처
+        function captureSelection() {
+            if (!rectangle) {
+                alert('먼저 사각형 도구로 영역을 선택해주세요.');
+                return;
+            }
+            
+            // 선택 영역의 좌표와 크기 계산
+            const left = rectangle.left;
+            const top = rectangle.top;
+            const width = rectangle.width * rectangle.scaleX;
+            const height = rectangle.height * rectangle.scaleY;
+            
+            // 임시 캔버스 생성
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            tempCanvas.width = width;
+            tempCanvas.height = height;
+            
+            // 선택 사각형을 임시로 숨기기
+            rectangle.set({ visible: false });
+            canvas.renderAll();
+            
+            // 원본 캔버스에서 선택 영역 복사
+            const canvasElement = canvas.getElement();
+            tempCtx.drawImage(
+                canvasElement,
+                left, top, width, height,
+                0, 0, width, height
+            );
+            
+            // 선택 사각형 다시 보이기
+            rectangle.set({ visible: true });
+            canvas.renderAll();
+            
+            // Base64로 변환
+            capturedImageData = tempCanvas.toDataURL('image/png');
+            
+            // 미리보기 표시
+            const preview = document.getElementById('captured-preview');
+            preview.src = capturedImageData;
+            preview.style.display = 'block';
+            
+            // 붙여넣기 버튼 활성화
+            document.getElementById('paste-btn').disabled = false;
+            
+            alert('영역이 성공적으로 캡처되었습니다!');
+        }
+        
+        // 캔버스에 붙여넣기
+        function pasteToCanvas() {
+            if (!capturedImageData) {
+                alert('먼저 영역을 캡처해주세요.');
+                return;
+            }
+            
+            fabric.Image.fromURL(capturedImageData, function(img) {
+                img.set({
+                    left: 50,
+                    top: 50,
+                    selectable: true
+                });
+                
+                canvas.add(img);
+                canvas.setActiveObject(img);
+                canvas.renderAll();
+                
+                alert('캡처한 이미지가 캔버스에 추가되었습니다!');
+            });
+        }
+        
+        // 샘플 이미지 추가
+        function addSampleImages() {
+            // 그라디언트 배경 생성
+            const gradient = new fabric.Gradient({
+                type: 'linear',
+                coords: { x1: 0, y1: 0, x2: 200, y2: 200 },
+                colorStops: [
+                    { offset: 0, color: '#ff6b6b' },
+                    { offset: 1, color: '#4ecdc4' }
+                ]
+            });
+            
+            const rect = new fabric.Rect({
+                left: 100,
+                top: 100,
+                width: 200,
+                height: 150,
+                fill: gradient,
+                rx: 10,
+                ry: 10
+            });
+            
+            canvas.add(rect);
+            
+            // 텍스트 추가
+            const text = new fabric.Text('Sample Image', {
+                left: 150,
+                top: 250,
+                fontSize: 24,
+                fill: '#333',
+                fontFamily: 'Arial'
+            });
+            
+            canvas.add(text);
+            canvas.renderAll();
+        }
+        
+        // 샘플 도형 추가
+        function addSampleShapes() {
+            const circle = new fabric.Circle({
+                left: 400,
+                top: 150,
+                radius: 50,
+                fill: '#9b59b6',
+                stroke: '#8e44ad',
+                strokeWidth: 3
+            });
+            
+            const triangle = new fabric.Triangle({
+                left: 500,
+                top: 100,
+                width: 80,
+                height: 80,
+                fill: '#e74c3c'
+            });
+            
+            canvas.add(circle);
+            canvas.add(triangle);
+            canvas.renderAll();
+        }
+        
+        // 캔버스 지우기
+        function clearCanvas() {
+            canvas.clear();
+            canvas.backgroundColor = '#ffffff';
+            clearSelectionRectangle();
+            capturedImageData = null;
+            document.getElementById('paste-btn').disabled = true;
+            document.getElementById('captured-preview').style.display = 'none';
+        }
+        
+        // 키보드 단축키
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Delete' && rectangle) {
+                clearSelectionRectangle();
+            }
+        });
+        
+        // 초기 설정
+        updateToolButtons();
+    </script>
+</body>
+</html>

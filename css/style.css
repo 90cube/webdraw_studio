@@ -1,0 +1,504 @@
+/* 기본 스타일 */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #282c34;
+    color: #f1f1f1;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    overflow: hidden;
+}
+
+/* 캔버스 컨테이너 */
+#canvas-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    /* 임시 배경색으로 캔버스 영역 표시 */
+    background-color: #4a4e5a; 
+}
+
+#main-canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.panel-header-buttons {
+    display: flex;
+    align-items: center;
+}
+
+.panel .refresh-btn {
+    background: none;
+    border: none;
+    color: #e8eaed;
+    cursor: pointer;
+    font-size: 16px;
+    margin-right: 8px;
+}
+
+.tool-group {
+    margin-bottom: 10px;
+}
+#resolution-presets {
+    display: grid;
+    gap: 5px;
+}
+
+#resolution-presets .ratio-1-1 {
+    grid-column: 1 / -1; /* Span full width */
+}
+
+.seed-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.seed-controls label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.seed-controls input[type="number"] {
+    width: calc(50% - 5px);
+}
+
+.step-noise-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.step-noise-controls label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.step-noise-controls input[type="number"] {
+    width: 50px;
+}
+
+.step-noise-controls input[type="checkbox"] {
+    margin-left: 5px;
+}
+
+.sampler-scheduler-inputs {
+    display: flex;
+    gap: 10px; /* Add some space between them */
+}
+
+.sampler-scheduler-inputs > div {
+    flex: 1;
+}
+
+.sampler-scheduler-inputs label {
+    font-size: 12px;
+    color: #bdc1c6;
+}
+
+.sampler-scheduler-inputs input {
+    width: 100%;
+    box-sizing: border-box; /* padding and border in the element's total width and height */
+}
+
+.resolution-inputs {
+    display: flex;
+    justify-content: space-between;
+}
+
+.resolution-inputs label {
+    display: flex;
+    align-items: center;
+}
+
+.resolution-inputs input {
+    width: calc(50% - 5px);
+}
+
+.folder {
+    cursor: pointer;
+    font-weight: bold;
+    color: #8ab4f8;
+}
+
+.folder .toggle-arrow {
+    display: inline-block;
+    width: 1em;
+    text-align: center;
+    transition: transform 0.1s;
+}
+
+.folder-content {
+    list-style: none;
+    padding-left: 15px;
+    margin: 0;
+}
+
+.folder-content.collapsed {
+    display: none;
+}
+
+.folder-content li {
+    margin-top: 5px;
+    /* position: relative; is no longer needed here */
+}
+
+.model-tooltip {
+    /* display: none; is no longer needed as it's created dynamically */
+    position: absolute; /* Positioned relative to the body */
+    z-index: 1100; /* High z-index to appear above all other elements */
+    border: 1px solid #80868b;
+    background-color: #202124;
+    padding: 5px;
+    border-radius: 6px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    pointer-events: none; /* Tooltip should not be interactive */
+}
+
+.model-tooltip img {
+    max-width: 512px;
+    max-height: 512px;
+    width: auto;
+    height: auto;
+    display: block;
+}
+
+.tooltip-filename {
+    max-width: 512px; /* Match the image's max-width */
+    padding: 4px 8px;
+    color: #e8eaed;
+    background-color: #3c4049;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.file {
+    cursor: pointer;
+    color: #bdc1c6;
+}
+
+.file:hover {
+    text-decoration: underline;
+}
+
+.tool-group h4 {
+    margin: 0 0 5px 0;
+    font-size: 13px;
+}
+.btn {
+    background: #5f6368; color: white; border: 1px solid #80868b; padding: 5px 10px; margin: 2px; border-radius: 4px; cursor: pointer; font-size: 12px;
+}
+.btn:hover { background: #80868b; }
+.btn.active { background: #8ab4f8; color:#202124; }
+select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1px solid #80868b; border-radius: 4px; }
+#selection-info { font-size: 12px; color: #bdc1c6; margin-top: 8px; padding: 8px; background: #202124; border-radius: 4px; }
+
+/* Context Menu Styles */
+.context-menu {
+    position: absolute;
+    display: none;
+    background-color: #4a4e5a;
+    border: 1px solid #80868b;
+    border-radius: 6px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    padding: 5px 0;
+    z-index: 1000;
+    min-width: 150px;
+}
+
+.context-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.context-menu ul li {
+    position: relative; /* For submenu positioning */
+    padding: 8px 15px;
+    cursor: pointer;
+    color: #e8eaed;
+}
+
+.context-menu ul li:hover {
+    background-color: #5f6368;
+}
+
+.context-menu .submenu {
+    position: absolute;
+    left: 100%;
+    top: -5px; /* Adjust to align with parent */
+    display: none;
+    background-color: #4a4e5a;
+    border: 1px solid #80868b;
+    border-radius: 6px;
+    padding: 5px 0;
+    min-width: 150px;
+}
+
+.context-menu li.has-submenu:hover > .submenu {
+    display: block;
+}
+
+.context-menu li.has-submenu::after {
+    content: '▶';
+    position: absolute;
+    right: 10px;
+    font-size: 10px;
+    color: #bdc1c6;
+}
+
+/* Tab Styles */
+.tab-nav {
+    display: flex;
+    border-bottom: 1px solid #5f6368;
+}
+
+#panel-model-explorer .panel-content {
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 40px); /* Panel height minus header */
+}
+
+#panel-model-explorer .tab-content {
+    flex-grow: 1; /* Make this container grow */
+    overflow-y: auto; /* Add vertical scrollbar when needed */
+    overflow-x: hidden; /* Prevent horizontal scrollbar */
+}
+
+#panel-model-explorer .file {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    width: 100%;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    color: #bdc1c6;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.tab-btn.active {
+    color: #e8eaed;
+    border-bottom: 2px solid #8ab4f8;
+}
+
+.tab-pane {
+    display: none;
+    padding: 10px;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+.panel {
+    position: absolute;
+    background-color: rgba(60, 64, 73, 0.9);
+    border: 1px solid #5f6368;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    /* resize: both; */ /* 기존 리사이즈 기능 제거 */
+    overflow: visible; /* 자식요소(토글버튼)가 보여야 하므로 변경 */
+    min-width: 250px;
+    min-height: 150px;
+}
+
+.panel .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #5f6368;
+    color: #e8eaed;
+    padding: 0 12px;
+    height: 40px;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    cursor: move; /* 드래그 기능 암시 */
+    user-select: none;
+}
+
+/* Collapsible Panel Styles */
+.panel.collapsed .panel-content {
+    display: none;
+}
+
+/* For Left/Right panels, hide title and adjust width when collapsed */
+.panel.position-left.collapsed,
+.panel.position-right.collapsed {
+    width: auto !important; /* Let the panel shrink */
+    min-width: 0;
+}
+
+.panel.position-left.collapsed .panel-header .panel-title,
+.panel.position-right.collapsed .panel-header .panel-title {
+    display: none;
+}
+
+.panel.position-left.collapsed .panel-header,
+.panel.position-right.collapsed .panel-header {
+    padding: 0;
+}
+
+.panel.position-left.collapsed .collapse-toggle,
+.panel.position-right.collapsed .collapse-toggle {
+    width: 40px; /* Ensure the button has a fixed width */
+    height: 40px; /* Match header height */
+    border-radius: 7px;
+}
+
+
+.panel h2 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+    padding: 0;
+}
+
+/* 패널 위치 지정 */
+
+/* 중앙 상단 */
+#panel-generation-executor {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 400px;
+    height: 120px;
+}
+
+/* 좌측 */
+#panel-model-explorer {
+    top: 20px;
+    left: 20px;
+    width: 300px;
+    height: 400px;
+}
+#panel-parameters {
+    top: 440px;
+    left: 20px;
+    width: 300px; /* 225px -> 300px */
+    height: 520px; /* 650px -> 520px */
+}
+
+/* 우측 */
+#panel-area-capture {
+    top: 20px;
+    right: 20px;
+    width: 320px;
+    height: 280px;
+}
+#panel-multi-detailer {
+    top: 320px;
+    right: 20px;
+    width: 320px;
+    height: 300px;
+}
+
+/* 하단 */
+#panel-lora-selector {
+    bottom: 20px;
+    right: 20px;
+    width: 350px;
+    height: 200px;
+}
+#panel-prompt {
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1500px; /* 300px -> 1500px */
+    height: 480px; /* 600px -> 480px */
+}
+
+.prompt-panel-layout {
+    display: flex;
+    height: calc(100% - 40px); /* Subtract header height */
+}
+
+.prompt-inputs-section {
+    flex: 3; /* Takes 3/4 of space */
+    padding-right: 10px;
+    overflow-y: auto;
+}
+
+.execution-controls-section {
+    flex: 1; /* Takes 1/4 of space */
+    padding-left: 10px;
+    border-left: 1px solid #5f6368;
+    display: flex;
+    flex-direction: row; /* 세로 정렬을 위해 row로 변경 */
+    justify-content: space-around; /* 좌우 정렬 */
+    align-items: center; /* 상하 정렬 */
+    gap: 15px;
+}
+
+.vertical-slider-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.vertical-slider-group input[type="range"] {
+    appearance: none; /* 기본 스타일 제거 */
+    -webkit-appearance: none; /* Webkit 브라우저용 기본 스타일 제거 */
+    writing-mode: vertical-lr; /* 슬라이더를 세로로 */
+    direction: rtl; /* 슬라이더 방향 반전 */
+    width: 20px;
+    height: 120px;
+    padding: 0 5px;
+}
+
+.execution-controls-section input[type="range"] {
+    width: 100%;
+}
+
+.execution-controls-section .tool-group {
+    margin-bottom: 0;
+}
+
+.execution-controls-section h4 {
+    margin-bottom: 5px;
+}
+
+.execution-controls-section span {
+    text-align: center;
+    display: block;
+    margin-top: 5px;
+}
+
+textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #3c4049;
+    border: 1px solid #5f6368;
+    color: #e8eaed;
+    padding: 5px;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+textarea:focus {
+    outline: none;
+    border-color: #8ab4f8;
+}
+width: 300px;
+    height: 150px;
+}

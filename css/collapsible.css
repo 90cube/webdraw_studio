@@ -1,0 +1,43 @@
+/* Collapsible Panel Styles */
+.panel .panel-content {
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+.panel.collapsed .panel-content {
+    max-height: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    opacity: 0;
+    margin: 0;
+}
+
+.panel .collapse-toggle {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: #e8eaed;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Collapsed State Base */
+.panel.collapsed {
+    min-height: 40px;
+    height: 40px !important;
+    min-width: 40px;
+    transition: all 0.3s ease-in-out;
+}
+
+/* Directional Collapse */
+.panel.position-left.collapsed { transform: translateX(calc(-100% + 42px)); }
+.panel.position-right.collapsed { transform: translateX(calc(100% - 42px)); }
+.panel.position-top.collapsed { transform: translateY(calc(-100% + 42px)); }
+.panel.position-bottom.collapsed { transform: translateY(calc(100% - 42px)); }
+
+.panel.position-left, .panel.position-right, .panel.position-top, .panel.position-bottom {
+    transition: transform 0.3s ease-in-out;
+}

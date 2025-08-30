@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Web App</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/collapsible.css">
+</head>
+<body>
+    <div id="canvas-container">
+        <!-- 메인 캔버스 (Fabric.js) -->
+        <canvas id="main-canvas"></canvas>
+        <!-- 에디트 캔버스 (필요시 활성화) -->
+        <!-- <div id="edit-canvas-view" class="view"></div> -->
+    </div>
+
+    <!-- 플로팅 UI 패널들 -->
+    <div id="panel-generation-executor" class="panel"></div>
+
+    <div id="panel-model-explorer" class="panel"></div>
+    <div id="panel-parameters" class="panel"></div>
+
+    <div id="panel-area-capture" class="panel"></div>
+    <div id="panel-multi-detailer" class="panel"></div>
+
+    <div id="panel-prompt" class="panel"></div>
+    <div id="panel-lora-selector" class="panel"></div>
+
+    <!-- 라이브러리 스크립트 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- 애플리케이션 스크립트 -->
+    <script type="module" src="js/app.js"></script>
+
+    <!-- 컨텍스트 메뉴 -->
+    <div id="context-menu" class="context-menu">
+        <ul>
+            <li>임시 액션 1</li>
+            <li>임시 액션 2</li>
+        </ul>
+    </div>
+</body>
+</html>
