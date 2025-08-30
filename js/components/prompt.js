@@ -1,5 +1,4 @@
 import state from '../core/stateManager.js';
-import api from '../core/mockApi.js';
 
 const panelId = 'panel-prompt';
 let panel;
@@ -92,11 +91,22 @@ export async function init() {
     panel.classList.add('position-bottom');
     panel.innerHTML = render();
     attachEventListeners();
-    // updateUI(); // This can be integrated or called separately
 
-    const positivePresets = await api.fetchPositivePresets();
-    renderPresets(positivePresets, panel.querySelector('#positive-presets-container'));
+    try {
+        const positivePresetsRes = await fetch('http://localhost:8001/api/presets/positive');
+        const negativePresetsRes = await fetch('http://localhost:8001/api/presets/negative');
 
-    const negativePresets = await api.fetchNegativePresets();
-    renderPresets(negativePresets, panel.querySelector('#negative-presets-container'));
+        if (!positivePresetsRes.ok) throw new Error(`Failed to fetch positive presets: ${positivePresetsRes.status}`);
+        if (!negativePresetsRes.ok) throw new Error(`Failed to fetch negative presets: ${negativePresetsRes.status}`);
+
+        const positivePresets = await positivePresetsRes.json();
+        const negativePresets = await negativePresetsRes.json();
+
+        renderPresets(positivePresets, panel.querySelector('#positive-presets-container'));
+        renderPresets(negativePresets, panel.querySelector('#negative-presets-container'));
+    } catch (error) {
+        console.error("Failed to fetch presets:", error);
+        panel.querySelector('#positive-presets-container').innerHTML = `<p style="color: red;">프리셋을 불러오는 데 실패했습니다.</p>`;
+        panel.querySelector('#negative-presets-container').innerHTML = `<p style="color: red;">프리셋을 불러오는 데 실패했습니다.</p>`;
+    }
 }

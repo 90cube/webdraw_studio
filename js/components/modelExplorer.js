@@ -4,32 +4,56 @@ const panelId = 'panel-model-explorer';
 let panel;
 let checkpointList = [];
 let vaeList = [];
+let loraList = []; // New: LoRA list
 
 // 파일 리스트를 계층적 트리 구조로 변환
-function buildTree(files) {
+function buildTree(files, selectedPaths = []) {
     const tree = {};
     files.forEach(file => {
         let currentLevel = tree;
 
-        // 경로 키워드를 기반으로 표시될 폴더 경로를 정규화합니다.
-        let displaySubfolder = file.subfolder;
-        const pathLower = file.path.toLowerCase();
-        if (pathLower.includes('sdxl') || pathLower.includes('xl')) {
-            if (!file.subfolder.toLowerCase().startsWith('sdxl')) {
-                displaySubfolder = `SDXL/${file.subfolder}`.replace(/[/]$/, '');
-            }
-        } else if (pathLower.includes('sd15')) {
-            if (!file.subfolder.toLowerCase().startsWith('sd15')) {
-                displaySubfolder = `sd15/${file.subfolder}`.replace(/[/]$/, '');
+        // Determine the primary category (SDXL or sd15) based on the FIRST subdirectory
+        let primaryCategory = null;
+        const subfolderParts = file.subfolder.split(/[\/]/).filter(p => p);
+        if (subfolderParts.length > 0) {
+            const firstPart = subfolderParts[0].toLowerCase();
+            if (firstPart === 'sd15') {
+                primaryCategory = 'sd15';
+            } else if (firstPart === 'sdxl' || firstPart === 'ilxl') { // Explicitly map ILXL to SDXL
+                primaryCategory = 'sdxl'; // Changed to lowercase 'sdxl'
             }
         }
 
-        const pathParts = displaySubfolder.split(/[\/]/).filter(p => p);
-        
-        pathParts.forEach(part => {
-            if (!currentLevel[part]) currentLevel[part] = {};
+        // If a primary category is determined, create that as the first level
+        if (primaryCategory) {
+            if (!currentLevel[primaryCategory]) {
+                currentLevel[primaryCategory] = {};
+            }
+            currentLevel = currentLevel[primaryCategory];
+        } else {
+            // If no primary category (e.g., model directly in checkpoints root), put it under "기타" (Misc)
+            if (!currentLevel['기타']) {
+                currentLevel['기타'] = {};
+            }
+            currentLevel = currentLevel['기타'];
+        }
+
+        // Now, add the remaining subfolders from the original path, starting from the second part
+        let startIndex = 0;
+        if (subfolderParts.length > 0 && primaryCategory) {
+            const firstOriginalPartLower = subfolderParts[0].toLowerCase();
+            if (firstOriginalPartLower === primaryCategory.toLowerCase() || (firstOriginalPartLower === 'ilxl' && primaryCategory === 'sdxl')) {
+                startIndex = 1;
+            }
+        }
+
+        for (let i = startIndex; i < subfolderParts.length; i++) {
+            const part = subfolderParts[i];
+            if (!currentLevel[part]) {
+                currentLevel[part] = {};
+            }
             currentLevel = currentLevel[part];
-        });
+        }
 
         if (!currentLevel._files) currentLevel._files = [];
         currentLevel._files.push(file);
@@ -88,6 +112,13 @@ async function renderVaes() {
     panel.querySelector('#vae-content').innerHTML = renderTree(tree);
 }
 
+// New: Render LoRAs
+async function renderLoras() {
+    const selectedLoras = state.getState('selectedLoras') || [];
+    const tree = buildTree(loraList, selectedLoras);
+    panel.querySelector('#loras-content').innerHTML = renderTree(tree, selectedLoras);
+}
+
 function attachEventListeners() {
     panel.querySelectorAll('.tab-btn').forEach(button => {
         button.addEventListener('click', () => {
@@ -136,7 +167,7 @@ function attachEventListeners() {
     checkpointsContent.addEventListener('click', e => {
         if (e.target.classList.contains('file')) {
             const subfolder = e.target.dataset.subfolder;
-            const subfolderParts = subfolder.split(/[\\/]/).filter(p => p);
+            const subfolderParts = subfolder.split(/[\/]/).filter(p => p);
             let baseModel = null;
             if (subfolderParts.length > 0) {
                 const firstPart = subfolderParts[0].toLowerCase();
@@ -267,4 +298,3 @@ export async function init() {
         panel.querySelector('#checkpoints-content').innerHTML = `<p style="color: red;">모델을 불러오는 데 실패했습니다.</p>`;
     }
 }
-

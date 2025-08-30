@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pathlib import Path
 from typing import List, Dict, Any
 from fastapi.middleware.cors import CORSMiddleware
+import json # Added json import
 
 app = FastAPI()
 
@@ -80,3 +81,31 @@ def get_loras() -> List[Dict[str, Any]]:
             })
             
     return loras
+
+@app.get("/api/presets/positive")
+def get_positive_presets() -> List[Dict[str, str]]:
+    presets_dir = Path("models/presets/posprpt")
+    presets = []
+    for p in presets_dir.glob("*.json"):
+        try:
+            content = p.read_text(encoding='utf-8')
+            data = json.loads(content)
+            if "prompt" in data:
+                presets.append({"name": p.stem.replace('_', ' ').title(), "prompt": data["prompt"]})
+        except Exception as e:
+            print(f"Error reading preset file {p}: {e}")
+    return presets
+
+@app.get("/api/presets/negative")
+def get_negative_presets() -> List[Dict[str, str]]:
+    presets_dir = Path("models/presets/negprpt")
+    presets = []
+    for p in presets_dir.glob("*.json"):
+        try:
+            content = p.read_text(encoding='utf-8')
+            data = json.loads(content)
+            if "prompt" in data:
+                presets.append({"name": p.stem.replace('_', ' ').title(), "prompt": data["prompt"]})
+        except Exception as e:
+            print(f"Error reading preset file {p}: {e}")
+    return presets
