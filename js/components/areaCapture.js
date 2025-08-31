@@ -31,7 +31,7 @@ function render() {
                 <button id="rectangle-tool" class="btn">사각형</button>
             </div>
             <div class="tool-group">
-                <h4>SD 비율</h4>
+                <label for="aspect-ratio">SD 비율</label>
                 <select id="aspect-ratio">
                     <option value="free">자유 비율</option>
                     <option value="512x512">1:1 (512x512)</option>
