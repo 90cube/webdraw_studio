@@ -8,33 +8,43 @@ function render() {
         <div class="panel-header"><h2>프롬프트</h2><button class="collapse-toggle">v</button></div>
         <div class="panel-content prompt-panel-layout">
             <div class="prompt-inputs-section">
-                <div class="tool-group">
-                    <h4>긍정 프롬프트</h4>
-                    <textarea id="positive-prompt" rows="4" placeholder="여기에 긍정 프롬프트를 입력하세요."></textarea>
-                    <div class="tool-group">
-                        <h5>긍정 프리셋</h5>
-                        <div id="positive-presets-container" class="presets-container"></div>
+                <div class="prompt-group positive-group">
+                    <div class="prompt-header">
+                        <h4>긍정 프롬프트</h4>
+                        <div class="preset-buttons">
+                            <h5>긍정 프리셋</h5>
+                            <div id="positive-presets-container" class="presets-container"></div>
+                        </div>
                     </div>
+                    <textarea id="positive-prompt" rows="3" placeholder="여기에 긍정 프롬프트를 입력하세요."></textarea>
                 </div>
-                <div class="tool-group">
-                    <h4>부정 프롬프트</h4>
-                    <textarea id="negative-prompt" rows="4" placeholder="여기에 부정 프롬프트를 입력하세요."></textarea>
-                    <div class="tool-group">
-                        <h5>부정 프리셋</h5>
-                        <div id="negative-presets-container" class="presets-container"></div>
+                <div class="prompt-group negative-group">
+                    <div class="prompt-header">
+                        <h4>부정 프롬프트</h4>
+                        <div class="preset-buttons">
+                            <h5>부정 프리셋</h5>
+                            <div id="negative-presets-container" class="presets-container"></div>
+                        </div>
                     </div>
+                    <textarea id="negative-prompt" rows="3" placeholder="여기에 부정 프롬프트를 입력하세요."></textarea>
                 </div>
             </div>
             <div class="execution-controls-section">
-                <div class="tool-group">
-                    <label for="param-cfg">CFG</label>
-                    <input type="range" id="param-cfg" min="0" max="20" value="5">
-                    <span id="cfg-value">5</span>
-                </div>
-                <div class="tool-group">
-                    <label for="param-denoise">Denoise</label>
-                    <input type="range" id="param-denoise" min="0" max="1" value="1" step="0.01">
-                    <span id="denoise-value">1</span>
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label for="param-cfg">CFG</label>
+                        <div class="slider-container">
+                            <input type="range" id="param-cfg" min="0" max="20" value="5">
+                            <span id="cfg-value" class="value-display">5</span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label for="param-denoise">Denoise</label>
+                        <div class="slider-container">
+                            <input type="range" id="param-denoise" min="0" max="1" value="1" step="0.01">
+                            <span id="denoise-value" class="value-display">1</span>
+                        </div>
+                    </div>
                 </div>
                 <button id="generate-btn" class="btn-generate">GENERATE</button>
             </div>

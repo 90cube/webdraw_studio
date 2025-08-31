@@ -28,10 +28,6 @@ function render() {
             <div class="tool-group tool-group-horizontal">
                 <button id="rectangle-tool" class="btn">영역 지정</button>
                 <button id="capture-btn" class="btn">복제</button>
-                <div id="selection-info">W: - H: -</div>
-            </div>
-            <div class="tool-group tool-group-aspect-ratio">
-                
                 <select id="aspect-ratio" aria-label="비율 선택">
                     <option value="free">자유 비율</option>
                     <option value="1:1">1:1</option>
@@ -40,10 +36,10 @@ function render() {
                     <option value="16:9">16:9</option>
                     <option value="21:9">21:9</option>
                 </select>
-                <div class="toggle-switch">
-                    <input type="checkbox" id="invert-ratio-toggle">
-                    <label for="invert-ratio-toggle">역전</label>
-                </div>
+                <button id="invert-ratio-toggle" class="btn toggle-btn" title="비율 역전">🔄</button>
+            </div>
+            <div class="tool-group">
+                <div id="selection-info">W: - H: -</div>
             </div>
         </div>
     `;
@@ -80,6 +76,15 @@ function toggleAreaDesignation() {
 function updateToolButtons() {
     // Only toggle the active state of the rectangle tool button
     panel.querySelector('#rectangle-tool').classList.toggle('active', currentMode === 'rectangle');
+}
+
+function updateInvertToggleButton() {
+    const invertToggle = panel.querySelector('#invert-ratio-toggle');
+    if (invertToggle) {
+        invertToggle.classList.toggle('active', isInverted);
+        invertToggle.textContent = isInverted ? '🔃' : '🔄';
+        invertToggle.title = isInverted ? '비율 역전 (활성화됨)' : '비율 역전';
+    }
 }
 
 function updateSelectionConstraints() {
@@ -146,9 +151,16 @@ function attachEventListeners() {
     panel.querySelector('#rectangle-tool').addEventListener('click', toggleAreaDesignation);
     panel.querySelector('#aspect-ratio').addEventListener('change', updateSelectionConstraints);
     panel.querySelector('#capture-btn').addEventListener('click', captureSelection);
-    panel.querySelector('#invert-ratio-toggle').addEventListener('change', (e) => {
-        isInverted = e.target.checked;
+    
+    // Toggle button for ratio inversion
+    const invertToggle = panel.querySelector('#invert-ratio-toggle');
+    invertToggle.addEventListener('click', (e) => {
+        isInverted = !isInverted;
+        updateInvertToggleButton();
     });
+    
+    // Initialize toggle button state
+    updateInvertToggleButton();
 
     canvas.on('mouse:down', o => {
         if (currentMode !== 'rectangle') return;

@@ -14,30 +14,68 @@
 
 .panel .collapse-toggle {
     position: absolute;
-    top: 5px;
-    right: 10px;
+    top: 8px;
+    right: 12px;
     cursor: pointer;
-    background: none;
+    background: rgba(255, 255, 255, 0.1);
     border: none;
     color: #e8eaed;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.panel .collapse-toggle:hover {
+    background: rgba(108, 182, 255, 0.2);
+    color: #6cb6ff;
+    transform: scale(1.05);
 }
 
 /* Collapsed State Base */
 .panel.collapsed {
-    min-height: 40px;
-    height: 40px !important;
-    min-width: 40px;
-    transition: all 0.3s ease-in-out;
+    min-height: 44px;
+    height: 44px !important;
+    min-width: 44px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 4px 20px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 /* Directional Collapse */
-.panel.position-left.collapsed { transform: translateX(calc(-100% + 42px)); }
-.panel.position-right.collapsed { transform: translateX(calc(100% - 42px)); }
-.panel.position-top.collapsed { transform: translateY(calc(-100% + 42px)); }
-.panel.position-bottom.collapsed { transform: translateY(calc(100% - 42px)); }
+.panel.position-left.collapsed { 
+    transform: translateX(calc(-100% + 50px)) scale(0.9); 
+}
+.panel.position-right.collapsed { 
+    transform: translateX(calc(100% - 50px)) scale(0.9); 
+}
+.panel.position-top.collapsed { 
+    transform: translateY(calc(-100% + 50px)) scale(0.9); 
+}
+.panel.position-bottom.collapsed { 
+    transform: translateY(calc(100% - 50px)) scale(0.9); 
+}
 
-.panel.position-left, .panel.position-right, .panel.position-top, .panel.position-bottom {
-    transition: transform 0.3s ease-in-out;
+/* 플로팅 패널 호버 효과 */
+.panel:not(.dragging):hover {
+    box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px) scale(1.01);
+}
+
+.panel.collapsed:not(.dragging):hover {
+    transform: translateY(-3px) scale(1.05);
+}
+
+/* 드래깅 중에는 호버 효과 비활성화 */
+.panel.dragging:hover {
+    transform: scale(1.02);
 }
