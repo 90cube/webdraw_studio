@@ -388,6 +388,7 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
     border-top-left-radius: 7px;
     border-top-right-radius: 7px;
     cursor: move; /* 드래그 기능 암시 */
+    -webkit-user-select: none;
     user-select: none;
 }
 
