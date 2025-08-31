@@ -26,16 +26,17 @@ function render() {
                 </div>
             </div>
             <div class="execution-controls-section">
-                <div class="tool-group vertical-slider-group">
+                <div class="tool-group">
                     <label for="param-cfg">CFG</label>
                     <input type="range" id="param-cfg" min="0" max="20" value="5">
                     <span id="cfg-value">5</span>
                 </div>
-                <div class="tool-group vertical-slider-group">
+                <div class="tool-group">
                     <label for="param-denoise">Denoise</label>
                     <input type="range" id="param-denoise" min="0" max="1" value="1" step="0.01">
                     <span id="denoise-value">1</span>
                 </div>
+                <button id="generate-btn" class="btn-generate">GENERATE</button>
             </div>
         </div>
     `;

@@ -56,7 +56,7 @@ def get_vaes() -> List[Dict[str, Any]]:
             
             vaes.append({
                 "name": p.name,
-                "path": str(p).replace('\\', '/'),
+                "path": str(p).replace('\\', '/') ,
                 "subfolder": str(p.parent.relative_to(vaes_dir)).replace('\\', '/') if p.parent != vaes_dir else "",
                 "preview_image": str(image_path).replace('\\', '/') if image_path else None
             })
@@ -75,7 +75,7 @@ def get_loras() -> List[Dict[str, Any]]:
             
             loras.append({
                 "name": p.name,
-                "path": str(p).replace('\\', '/'),
+                "path": str(p).replace('\\', '/') ,
                 "subfolder": str(p.parent.relative_to(loras_dir)).replace('\\', '/') if p.parent != loras_dir else "",
                 "preview_image": str(image_path).replace('\\', '/') if image_path else None
             })
@@ -109,3 +109,14 @@ def get_negative_presets() -> List[Dict[str, str]]:
         except Exception as e:
             print(f"Error reading preset file {p}: {e}")
     return presets
+
+@app.get("/api/models/detection")
+def get_detection_models() -> List[str]:
+    # IMPORTANT: This is an absolute path outside the project directory
+    models_dir = Path("D:/Cube_Project/webtoonmakers/models/ultralytics")
+    pt_files = []
+    if models_dir.exists() and models_dir.is_dir():
+        for p in models_dir.rglob("*.pt"):
+            if p.is_file():
+                pt_files.append(p.name)
+    return pt_files

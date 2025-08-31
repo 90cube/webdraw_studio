@@ -1,20 +1,20 @@
 let canvas;
-let currentMode = 'selection';
+let currentMode = 'selection'; // Default to selection mode
 let isDrawing = false;
 let rectangle = null;
 let aspectRatioConstraint = 'free';
 let capturedImageData = null;
+let isInverted = false;
 
 const panelId = 'panel-area-capture';
 let panel;
 
 const aspectRatios = {
-    '512x512': { width: 512, height: 512 },
-    '512x768': { width: 512, height: 768 },
-    '768x512': { width: 768, height: 512 },
-    '1024x1024': { width: 1024, height: 1024 },
-    '768x1024': { width: 768, height: 1024 },
-    '1024x768': { width: 1024, height: 768 }
+    '1:1': { width: 256, height: 256 },
+    '3:2': { width: 384, height: 256 },
+    '4:3': { width: 512, height: 384 },
+    '16:9': { width: 512, height: 288 },
+    '21:9': { width: 512, height: 219 }
 };
 
 function roundToMultiple(value, multiple = 8) {
@@ -25,30 +25,26 @@ function render() {
     return `
         <div class="panel-header"><h2>영역 캡처</h2><button class="collapse-toggle">></button></div>
         <div class="panel-content">
-            <div class="tool-group">
-                <h4>선택 도구</h4>
-                <button id="selection-tool" class="btn active">선택</button>
-                <button id="rectangle-tool" class="btn">사각형</button>
+            <div class="tool-group tool-group-horizontal">
+                <button id="rectangle-tool" class="btn">영역 지정</button>
+                <button id="capture-btn" class="btn">복제</button>
+                <div id="selection-info">W: - H: -</div>
             </div>
-            <div class="tool-group">
-                <label for="aspect-ratio">SD 비율</label>
-                <select id="aspect-ratio">
+            <div class="tool-group tool-group-aspect-ratio">
+                
+                <select id="aspect-ratio" aria-label="비율 선택">
                     <option value="free">자유 비율</option>
-                    <option value="512x512">1:1 (512x512)</option>
-                    <option value="512x768">2:3 (512x768)</option>
-                    <option value="768x512">3:2 (768x512)</option>
-                    <option value="1024x1024">1:1 (1024x1024)</option>
-                    <option value="768x1024">3:4 (768x1024)</option>
-                    <option value="1024x768">4:3 (1024x768)</option>
+                    <option value="1:1">1:1</option>
+                    <option value="3:2">3:2</option>
+                    <option value="4:3">4:3</option>
+                    <option value="16:9">16:9</option>
+                    <option value="21:9">21:9</option>
                 </select>
+                <div class="toggle-switch">
+                    <input type="checkbox" id="invert-ratio-toggle">
+                    <label for="invert-ratio-toggle">역전</label>
+                </div>
             </div>
-            <div class="tool-group">
-                <h4>캡처 & 붙여넣기</h4>
-                <button id="capture-btn" class="btn">캡처</button>
-                <button id="paste-btn" class="btn" disabled>붙여넣기</button>
-            </div>
-            <div id="selection-info">선택된 영역: 없음</div>
-            <img id="captured-preview" alt="캡처 미리보기" style="width:100%; display:none; margin-top:10px;">
         </div>
     `;
 }
@@ -72,8 +68,17 @@ function setRectangleMode() {
     updateToolButtons();
 }
 
+// New toggle function
+function toggleAreaDesignation() {
+    if (currentMode === 'selection') {
+        setRectangleMode();
+    } else {
+        setSelectionMode();
+    }
+}
+
 function updateToolButtons() {
-    panel.querySelector('#selection-tool').classList.toggle('active', currentMode === 'selection');
+    // Only toggle the active state of the rectangle tool button
     panel.querySelector('#rectangle-tool').classList.toggle('active', currentMode === 'rectangle');
 }
 
@@ -86,9 +91,9 @@ function updateSelectionInfo(rect) {
     if (rect) {
         const width = roundToMultiple(rect.width * rect.scaleX);
         const height = roundToMultiple(rect.height * rect.scaleY);
-        info.innerHTML = `X:${Math.round(rect.left)}, Y:${Math.round(rect.top)}<br>W:${width}, H:${height}`;
+        info.innerHTML = `W: ${width} H: ${height}`;
     } else {
-        info.innerHTML = '선택된 영역: 없음';
+        info.innerHTML = 'W: - H: -';
     }
 }
 
@@ -101,32 +106,29 @@ function clearSelectionRectangle() {
 }
 
 function captureSelection() {
-    if (!rectangle) return alert('먼저 사각형 도구로 영역을 선택해주세요.');
+    if (!rectangle) {
+        alert('먼저 \'영역 지정\' 버튼을 눌러 영역을 선택해주세요.');
+        return;
+    }
     const { left, top, width, height } = rectangle;
-    // 캡처 직전: 선택 사각형 숨김
+    
     rectangle.set({ visible: false });
     canvas.renderAll();
 
-    // 임시 캔버스 생성
     const tempCanvas = document.createElement('canvas');
     const tempCtx = tempCanvas.getContext('2d');
     tempCanvas.width = width;
     tempCanvas.height = height;
 
-    // 캔버스에서 이미지 추출
     const canvasElement = canvas.getElement();
     tempCtx.drawImage(canvasElement, left, top, width, height, 0, 0, width, height);
 
-    // Base64로 변환
     capturedImageData = tempCanvas.toDataURL('image/png');
 
-    // 캡처 후: 선택 사각형 다시 표시
     rectangle.set({ visible: true });
     canvas.renderAll();
-    const preview = panel.querySelector('#captured-preview');
-    preview.src = capturedImageData;
-    preview.style.display = 'block';
-    panel.querySelector('#paste-btn').disabled = false;
+
+    pasteToCanvas();
 }
 
 function pasteToCanvas() {
@@ -135,15 +137,18 @@ function pasteToCanvas() {
         canvas.add(img);
         canvas.setActiveObject(img);
         canvas.renderAll();
+        setSelectionMode();
     });
 }
 
 function attachEventListeners() {
-    panel.querySelector('#selection-tool').addEventListener('click', setSelectionMode);
-    panel.querySelector('#rectangle-tool').addEventListener('click', setRectangleMode);
+    // Point the single button to the toggle function
+    panel.querySelector('#rectangle-tool').addEventListener('click', toggleAreaDesignation);
     panel.querySelector('#aspect-ratio').addEventListener('change', updateSelectionConstraints);
     panel.querySelector('#capture-btn').addEventListener('click', captureSelection);
-    panel.querySelector('#paste-btn').addEventListener('click', pasteToCanvas);
+    panel.querySelector('#invert-ratio-toggle').addEventListener('change', (e) => {
+        isInverted = e.target.checked;
+    });
 
     canvas.on('mouse:down', o => {
         if (currentMode !== 'rectangle') return;
@@ -161,17 +166,38 @@ function attachEventListeners() {
         let h = pointer.y - rectangle.top;
         if (aspectRatioConstraint !== 'free') {
             const ratio = aspectRatios[aspectRatioConstraint];
-            const targetRatio = ratio.width / ratio.height;
-            Math.abs(w / h) > targetRatio ? h = w / targetRatio : w = h * targetRatio;
+            let targetRatio = ratio.width / ratio.height;
+            if (isInverted) {
+                targetRatio = 1 / targetRatio; // Invert the ratio
+            }
+            if (Math.abs(w / h) > targetRatio) {
+                h = w / targetRatio;
+            } else {
+                w = h * targetRatio;
+            }
+        } else {
+            // Apply halving for "자유비율"
+            w = w * 0.5;
+            h = h * 0.5;
+            if (isInverted) {
+                // If "자유비율" and inverted, swap width and height
+                [w, h] = [h, w];
+            }
         }
         rectangle.set({ width: Math.abs(w), height: Math.abs(h) });
-        if (w < 0) rectangle.set({ left: pointer.x });
-        if (h < 0) rectangle.set({ top: pointer.y });
+        if (w < 0) {
+            rectangle.set({ left: pointer.x });
+        }
+        if (h < 0) {
+            rectangle.set({ top: pointer.y });
+        }
         canvas.renderAll();
         updateSelectionInfo(rectangle);
     });
 
-    canvas.on('mouse:up', () => { isDrawing = false; });
+    canvas.on('mouse:up', () => { 
+        isDrawing = false; 
+    });
 }
 
 export function init(canvasInstance) {
@@ -187,5 +213,5 @@ export function init(canvasInstance) {
     }
     
     attachEventListeners();
-    updateToolButtons();
+    updateToolButtons(); // Initial button state update
 }

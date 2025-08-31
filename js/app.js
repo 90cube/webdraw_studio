@@ -2,7 +2,7 @@ import { initCanvas } from './core/canvas.js';
 import { initDraggablePanels, initCollapsiblePanels } from './core/ui.js';
 
 // Import all component modules
-import { init as initGenerationExecutor } from './components/generationExecutor.js';
+
 import { init as initModelExplorer } from './components/modelExplorer.js';
 import { init as initParameters } from './components/parameters.js';
 import { init as initAreaCapture } from './components/areaCapture.js';
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initCollapsiblePanels();
 
     // 2. 모든 UI 컴포넌트 생성
-    initGenerationExecutor();
+    // initGenerationExecutor();
     initModelExplorer();
     initParameters();
     initAreaCapture(mainCanvas);

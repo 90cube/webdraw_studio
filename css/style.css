@@ -208,12 +208,12 @@ body, html {
 #panel-parameters .panel-content {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 4px;
     padding: 10px;
 }
 
 #panel-parameters .tool-group {
-    padding-bottom: 15px;
+    padding-bottom: 4px;
     border-bottom: 1px solid #5f6368;
 }
 
@@ -246,7 +246,7 @@ body, html {
 
 
 .tool-group h4 {
-    margin: 0 0 10px 0;
+    margin: 3px 0;
     font-size: 13px;
     font-weight: 600;
     color: #bdc1c6;
@@ -257,6 +257,16 @@ body, html {
 .btn:hover { background: #80868b; }
 .btn.active { background: #8ab4f8; color:#202124; }
 select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1px solid #80868b; border-radius: 4px; }
+
+.tool-group-aspect-ratio {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tool-group-aspect-ratio select {
+    width: 50%; /* Halve the UI size */
+}
 #selection-info { font-size: 12px; color: #bdc1c6; margin-top: 8px; padding: 8px; background: #202124; border-radius: 4px; }
 
 /* Context Menu Styles */
@@ -427,41 +437,34 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
 
 /* 패널 위치 지정 */
 
-/* 중앙 상단 */
-#panel-generation-executor {
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 400px;
-    height: 120px;
-}
+
 
 /* 좌측 */
 #panel-model-explorer {
     top: 20px;
     left: 20px;
     width: 300px;
-    height: 400px;
+    height: 200px;
 }
 #panel-parameters {
-    top: 440px;
+    top: 230px;
     left: 20px;
     width: 300px;
-    height: 520px;
+    height: 570px;
 }
 
 /* 우측 */
 #panel-area-capture {
     top: 20px;
     right: 20px;
-    width: 320px;
-    height: 280px;
+    width: 350px;
+    height: 140px;
 }
 #panel-multi-detailer {
-    top: 320px;
+    top: 180px;
     right: 20px;
-    width: 320px;
-    height: 300px;
+    width: 350px;
+    height: 680px;
 }
 
 /* 하단 */
@@ -473,32 +476,36 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
 }
 #panel-prompt {
     bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 1320px;
-    height: 480px;
+    left: 30%;
+    transform: translateX(-30%);
+    width: 820px;
+    height: 400px;
 }
 
 .prompt-panel-layout {
     display: flex;
-    height: calc(100% - 40px);
+    height: calc(100% - 20px);
+    padding-top: 0px;
+    box-sizing: border-box;
+    gap: 10px; /* Added gap for spacing between sections */
 }
 
 .prompt-inputs-section {
-    flex: 7;
-    padding-right: 10px;
+    flex: 3;
+    padding-right: 0px;
     overflow-y: auto;
 }
 
 .execution-controls-section {
     flex: 1;
-    padding-left: 10px;
-    border-left: 1px solid #5f6368;
+    padding-left: 0px; /* Removed padding-left */
+    border-left: none; /* Removed border-left */
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 40px;
+    gap: 5px;
+    flex-wrap: nowrap;
 }
 
 .vertical-slider-group {
@@ -585,7 +592,7 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
 }
 
 textarea {
-    width: 100%;
+    width: 70%;
     box-sizing: border-box;
     background-color: #3c4049;
     border: 1px solid #5f6368;
@@ -607,4 +614,159 @@ textarea:focus {
     font-size: 13px; /* 다른 h4 타이틀과 통일감 주기 */
     font-weight: 600; /* 다른 h4 타이틀과 통일감 주기 */
     color: #bdc1c6; /* 다른 h4 타이틀과 통일감 주기 */
+}
+
+#panel-prompt .tool-group {
+    margin-bottom: 5px;
+}
+
+/* Multi-Detailer Panel Specific Styles */
+#panel-multi-detailer .panel-content {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Gap between tool-groups */
+    overflow-y: auto;
+    height: calc(100% - 40px); /* Full height minus header */
+    box-sizing: border-box;
+}
+
+#panel-multi-detailer .tool-group {
+    margin-bottom: 5px;
+    border-bottom: 1px solid #5f6368;
+    padding-bottom: 10px;
+}
+#panel-multi-detailer .tool-group:last-child {
+    border-bottom: none;
+}
+
+#panel-multi-detailer .detailer-param-row {
+    margin-bottom: 4px; /* Vertical margin < 5px */
+}
+
+#panel-multi-detailer .detailer-param-row-split {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+#panel-multi-detailer .detailer-param-row-split > div {
+    flex: 1;
+}
+
+
+#panel-multi-detailer label {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 12px;
+    color: #bdc1c6;
+}
+
+#panel-multi-detailer input[type="number"],
+#panel-multi-detailer input[type="text"],
+#panel-multi-detailer select,
+#panel-multi-detailer textarea {
+    background-color: #3c4049;
+    border: 1px solid #5f6368;
+    color: #e8eaed;
+    padding: 5px;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#panel-multi-detailer textarea {
+    resize: vertical;
+}
+
+#panel-multi-detailer .slider-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#panel-multi-detailer .slider-row label {
+    flex-shrink: 0;
+    margin-bottom: 0;
+}
+
+#panel-multi-detailer .slider-row input[type="range"] {
+    flex-grow: 1;
+}
+
+#panel-multi-detailer .slider-row .slider-value {
+    min-width: 30px;
+    text-align: right;
+    font-size: 12px;
+}
+
+/* Styles for new Multi-Detailer Tab structure */
+#panel-multi-detailer .tab-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-top: 10px;
+}
+
+#panel-multi-detailer .detailer-activation-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0px; /* Space between activation row and parameters */
+}
+
+#panel-multi-detailer .detailer-activation-row label {
+    margin-bottom: 0;
+    font-weight: bold;
+}
+
+#panel-multi-detailer fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+    transition: opacity 0.3s ease;
+}
+
+#panel-multi-detailer fieldset[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* --- Collapse Fixes --- */
+
+/* Right Panel: Multi-Detailer */
+#panel-multi-detailer.collapsed {
+    width: 40px !important;
+    min-width: 40px !important;
+    overflow: hidden !important;
+}
+#panel-multi-detailer.collapsed .panel-header h2 {
+    display: none;
+}
+
+/* Bottom Panel: Prompt */
+#panel-prompt.collapsed {
+    height: 40px !important;
+    min-height: 40px !important;
+    overflow: hidden !important;
+}
+#panel-prompt.collapsed .panel-header h2 {
+    display: none;
+}
+
+.btn-generate {
+    background-color: #8ab4f8;
+    color: #202124;
+    border: none;
+    padding: 15px 25px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 15px; /* Add some space above */
+    border-top: 1px solid #5f6368; /* Add a subtle line */
+    padding-top: 15px; /* Adjust padding to account for border */
+}
+.btn-generate:hover {
+    background-color: #a1c9ff;
 }
