@@ -28,11 +28,13 @@ function render() {
             <div class="execution-controls-section">
                 <div class="tool-group vertical-slider-group">
                     <h4>CFG</h4>
+                    <label for="param-cfg">CFG 값 조절</label>
                     <input type="range" id="param-cfg" min="0" max="20" value="5">
                     <span id="cfg-value">5</span>
                 </div>
                 <div class="tool-group vertical-slider-group">
                     <h4>Denoise</h4>
+                    <label for="param-denoise">Denoise 값 조절</label>
                     <input type="range" id="param-denoise" min="0" max="1" value="1" step="0.01">
                     <span id="denoise-value">1</span>
                 </div>
