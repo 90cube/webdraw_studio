@@ -4,7 +4,6 @@ const panelId = 'panel-model-explorer';
 let panel;
 let checkpointList = [];
 let vaeList = [];
-let loraList = []; // New: LoRA list
 
 // 파일 리스트를 계층적 트리 구조로 변환
 function buildTree(files, selectedPaths = []) {
@@ -113,11 +112,7 @@ async function renderVaes() {
 }
 
 // New: Render LoRAs
-async function renderLoras() {
-    const selectedLoras = state.getState('selectedLoras') || [];
-    const tree = buildTree(loraList, selectedLoras);
-    panel.querySelector('#loras-content').innerHTML = renderTree(tree, selectedLoras);
-}
+
 
 function attachEventListeners() {
     panel.querySelectorAll('.tab-btn').forEach(button => {
@@ -192,64 +187,7 @@ function attachEventListeners() {
         }
     });
 
-    // New: LoRA click logic (multiple selection)
-    const lorasContent = panel.querySelector('#loras-content');
-    lorasContent.addEventListener('click', e => {
-        if (e.target.classList.contains('file')) {
-            const loraPath = e.target.dataset.path;
-            let selectedLoras = state.getState('selectedLoras') || [];
-
-            if (selectedLoras.includes(loraPath)) {
-                // Deselect
-                selectedLoras = selectedLoras.filter(path => path !== loraPath);
-                e.target.classList.remove('selected');
-            } else {
-                // Select
-                selectedLoras.push(loraPath);
-                e.target.classList.add('selected');
-            }
-            state.setState('selectedLoras', selectedLoras);
-            console.log('Selected LoRAs:', selectedLoras);
-        }
-    });
-
-    // New: LoRA Tooltip logic
-    lorasContent.addEventListener('mouseover', e => {
-        if (e.target.classList.contains('file') && e.target.dataset.preview) {
-            if (activeTooltip) activeTooltip.remove();
-
-            activeTooltip = document.createElement('div');
-            activeTooltip.className = 'model-tooltip';
-            const filename = e.target.textContent;
-            const previewSrc = e.target.dataset.preview;
-            activeTooltip.innerHTML = `
-                <div class="tooltip-filename">${filename}</div>
-                <img src="${previewSrc}" alt="Preview">
-            `;
-            document.body.appendChild(activeTooltip);
-
-            // Position the tooltip to the left of the mouse
-            const tooltipWidth = activeTooltip.offsetWidth; // Get width after appending
-            activeTooltip.style.left = `${e.pageX - tooltipWidth - 15}px`;
-            activeTooltip.style.top = `${e.pageY + 15}px`;
-        }
-    });
-
-    lorasContent.addEventListener('mousemove', e => {
-        if (activeTooltip) {
-            const tooltipWidth = activeTooltip.offsetWidth; // Get width dynamically
-            activeTooltip.style.left = `${e.pageX - tooltipWidth - 15}px`;
-            activeTooltip.style.top = `${e.pageY + 15}px`;
-        }
-    });
-
-    lorasContent.addEventListener('mouseout', e => {
-        if (e.target.classList.contains('file') && activeTooltip) {
-            activeTooltip.remove();
-            activeTooltip = null;
-        }
-    });
-}
+    }
 
 export async function init() {
     panel = document.getElementById(panelId);
@@ -260,39 +198,32 @@ export async function init() {
         <div class="panel-content">
             <div class="tab-nav">
                 <button class="tab-btn active" data-tab="checkpoints">Checkpoints</button>
-                <button class="tab-btn" data-tab="vae">VAE</button>
-                <button class="tab-btn" data-tab="loras">LoRAs</button> <!-- New LoRA Tab -->
+                                <button class="tab-btn" data-tab="vae">VAE</button>
             </div>
             <div class="tab-content">
                 <div id="checkpoints-content" class="tab-pane active"></div>
-                <div id="vae-content" class="tab-pane"></div>
-                <div id="loras-content" class="tab-pane"></div> <!-- New LoRA Pane -->
+                <div id="vae-content" class="tab-pane"></div> <!-- New LoRA Pane -->
             </div>
         </div>
     `;
     attachEventListeners();
 
     try {
-        const [checkpointsRes, vaesRes, lorasRes] = await Promise.all([
+        const [checkpointsRes, vaesRes] = await Promise.all([
             fetch('http://localhost:8001/api/models/checkpoints'),
-            fetch('http://localhost:8001/api/models/vaes'),
-            fetch('http://localhost:8001/api/models/loras') // New: Fetch LoRAs
+            fetch('http://localhost:8001/api/models/vaes')
         ]);
 
         if (!checkpointsRes.ok) throw new Error(`Failed to fetch checkpoints: ${checkpointsRes.status}`);
         if (!vaesRes.ok) throw new Error(`Failed to fetch VAEs: ${vaesRes.status}`);
-        if (!lorasRes.ok) throw new Error(`Failed to fetch LoRAs: ${lorasRes.status}`); // Handle LoRA fetch error
 
         checkpointList = await checkpointsRes.json();
         vaeList = await vaesRes.json();
-        loraList = await lorasRes.json(); // New: Store LoRA list
         
         await renderCheckpoints();
         await renderVaes();
-        await renderLoras(); // New: Render LoRAs
 
-        state.listen('currentBaseModel', renderVaes);
-        state.listen('selectedLoras', renderLoras); // New: Listen for LoRA selection changes
+                state.listen('currentBaseModel', renderVaes); // New: Listen for LoRA selection changes
     } catch (error) {
         console.error("Failed to fetch models:", error);
         panel.querySelector('#checkpoints-content').innerHTML = `<p style="color: red;">모델을 불러오는 데 실패했습니다.</p>`;

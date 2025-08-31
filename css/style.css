@@ -149,19 +149,17 @@ body, html {
 
 .folder-content li {
     margin-top: 5px;
-    /* position: relative; is no longer needed here */
 }
 
 .model-tooltip {
-    /* display: none; is no longer needed as it's created dynamically */
-    position: absolute; /* Positioned relative to the body */
-    z-index: 1100; /* High z-index to appear above all other elements */
+    position: absolute;
+    z-index: 1100;
     border: 1px solid #80868b;
     background-color: #202124;
     padding: 5px;
     border-radius: 6px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-    pointer-events: none; /* Tooltip should not be interactive */
+    pointer-events: none;
 }
 
 .model-tooltip img {
@@ -173,7 +171,7 @@ body, html {
 }
 
 .tooltip-filename {
-    max-width: 512px; /* Match the image's max-width */
+    max-width: 512px;
     padding: 4px 8px;
     color: #e8eaed;
     background-color: #3c4049;
@@ -193,7 +191,7 @@ body, html {
     padding: 6px 12px;
     border-radius: 4px;
     font-size: 13px;
-    pointer-events: none; /* Tooltip should not be interactive */
+    pointer-events: none;
     white-space: nowrap;
 }
 
@@ -210,13 +208,13 @@ body, html {
 #panel-parameters .panel-content {
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Add space between tool groups */
+    gap: 15px;
     padding: 10px;
 }
 
 #panel-parameters .tool-group {
     padding-bottom: 15px;
-    border-bottom: 1px solid #5f6368; /* Separator line */
+    border-bottom: 1px solid #5f6368;
 }
 
 #panel-parameters .tool-group:last-child {
@@ -235,7 +233,7 @@ body, html {
 }
 
 #panel-parameters input[type="checkbox"] {
-    accent-color: #8ab4f8; /* Modern checkbox color */
+    accent-color: #8ab4f8;
     width: 16px;
     height: 16px;
 }
@@ -243,12 +241,12 @@ body, html {
 #panel-parameters label {
     display: flex;
     align-items: center;
-    gap: 8px; /* Space between checkbox/label text */
+    gap: 8px;
 }
 
 
 .tool-group h4 {
-    margin: 0 0 10px 0; /* Adjusted margin */
+    margin: 0 0 10px 0;
     font-size: 13px;
     font-weight: 600;
     color: #bdc1c6;
@@ -281,7 +279,7 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
 }
 
 .context-menu ul li {
-    position: relative; /* For submenu positioning */
+    position: relative;
     padding: 8px 15px;
     cursor: pointer;
     color: #e8eaed;
@@ -294,7 +292,7 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
 .context-menu .submenu {
     position: absolute;
     left: 100%;
-    top: -5px; /* Adjust to align with parent */
+    top: -5px;
     display: none;
     background-color: #4a4e5a;
     border: 1px solid #80868b;
@@ -324,13 +322,13 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
 #panel-model-explorer .panel-content {
     display: flex;
     flex-direction: column;
-    height: calc(100% - 40px); /* Panel height minus header */
+    height: calc(100% - 40px);
 }
 
 #panel-model-explorer .tab-content {
-    flex-grow: 1; /* Make this container grow */
-    overflow-y: auto; /* Add vertical scrollbar when needed */
-    overflow-x: hidden; /* Prevent horizontal scrollbar */
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 #panel-model-explorer .file {
@@ -371,8 +369,7 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     z-index: 10;
-    /* resize: both; */ /* 기존 리사이즈 기능 제거 */
-    overflow: visible; /* 자식요소(토글버튼)가 보여야 하므로 변경 */
+    overflow: visible;
     min-width: 250px;
     min-height: 150px;
 }
@@ -387,7 +384,7 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
     height: 40px;
     border-top-left-radius: 7px;
     border-top-right-radius: 7px;
-    cursor: move; /* 드래그 기능 암시 */
+    cursor: move;
     -webkit-user-select: none;
     user-select: none;
 }
@@ -397,10 +394,9 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
     display: none;
 }
 
-/* For Left/Right panels, hide title and adjust width when collapsed */
 .panel.position-left.collapsed,
 .panel.position-right.collapsed {
-    width: auto !important; /* Let the panel shrink */
+    width: auto !important;
     min-width: 0;
 }
 
@@ -416,8 +412,8 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
 
 .panel.position-left.collapsed .collapse-toggle,
 .panel.position-right.collapsed .collapse-toggle {
-    width: 40px; /* Ensure the button has a fixed width */
-    height: 40px; /* Match header height */
+    width: 40px;
+    height: 40px;
     border-radius: 7px;
 }
 
@@ -450,8 +446,8 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
 #panel-parameters {
     top: 440px;
     left: 20px;
-    width: 300px; /* 225px -> 300px */
-    height: 520px; /* 650px -> 520px */
+    width: 300px;
+    height: 520px;
 }
 
 /* 우측 */
@@ -479,30 +475,30 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 1320px; /* 1500px -> 1320px */
-    height: 480px; /* 600px -> 480px */
+    width: 1320px;
+    height: 480px;
 }
 
 .prompt-panel-layout {
     display: flex;
-    height: calc(100% - 40px); /* Subtract header height */
+    height: calc(100% - 40px);
 }
 
 .prompt-inputs-section {
-    flex: 7; /* 3 -> 7 */
+    flex: 7;
     padding-right: 10px;
     overflow-y: auto;
 }
 
 .execution-controls-section {
-    flex: 1; /* Takes 1/4 of space */
+    flex: 1;
     padding-left: 10px;
     border-left: 1px solid #5f6368;
     display: flex;
-    flex-direction: row; /* 세로 정렬을 위해 row로 변경 */
-    justify-content: center; /* 중앙 정렬 */
-    align-items: center; /* 상하 정렬 */
-    gap: 40px; /* 슬라이더 간의 간격 조정 */
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
 }
 
 .vertical-slider-group {
@@ -513,14 +509,14 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
 }
 
 .vertical-slider-group input[type="range"] {
-    -webkit-appearance: none; /* 기본 스타일 제거 */
+    -webkit-appearance: none;
     appearance: none;
-    background: transparent; /* 배경 제거 */
+    background: transparent;
     cursor: pointer;
     writing-mode: vertical-lr;
     direction: rtl;
-    width: 20px; /* 전체 너비 */
-    height: 150px; /* 전체 높이 */
+    width: 20px;
+    height: 150px;
 }
 
 /* Chrome, Safari, Edge 용 트랙 스타일 */
@@ -535,7 +531,7 @@ select { width: 100%; padding: 4px; background: #3c4049; color: white; border: 1
 .vertical-slider-group input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    margin-right: -7px; /* 트랙 중앙 정렬 */
+    margin-right: -7px;
     background-color: #e8eaed;
     height: 20px;
     width: 20px;
@@ -603,6 +599,12 @@ textarea:focus {
     outline: none;
     border-color: #8ab4f8;
 }
-width: 300px;
-    height: 150px;
+
+/* 프롬프트 패널 프리셋 타이틀 여백 조정 */
+#panel-prompt .tool-group h5 {
+    margin-top: 0px;
+    margin-bottom: 5px; /* 프리셋 버튼과의 간격은 약간 유지 */
+    font-size: 13px; /* 다른 h4 타이틀과 통일감 주기 */
+    font-weight: 600; /* 다른 h4 타이틀과 통일감 주기 */
+    color: #bdc1c6; /* 다른 h4 타이틀과 통일감 주기 */
 }
