@@ -57,7 +57,7 @@ export async function init() {
     panel = document.getElementById(panelId);
     if (!panel) return;
     panel.classList.add('position-right');
-    panel.innerHTML = `<div class="panel-header"><h2>LoRA 선택기</h2><button class="collapse-toggle">></button></div><div class="panel-content"></div>`;
+    panel.innerHTML = `<div class="panel-header"><h2 class="panel-title">LoRA 선택기</h2><button class="collapse-toggle"></button></div><div class="panel-content"></div>`;
 
     try {
         const response = await fetch('http://localhost:8001/api/models/loras');

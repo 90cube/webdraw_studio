@@ -88,7 +88,7 @@ function render() {
     }
 
     return `
-        <div class="panel-header"><h2>다중 디테일러</h2><button class="collapse-toggle">></button></div>
+        <div class="panel-header"><h2 class="panel-title">다중 디테일러</h2><button class="collapse-toggle"></button></div>
         <div class="panel-content">
             <div class="tab-nav">${tabButtons}</div>
             <div class="tab-content">${tabPanes}</div>

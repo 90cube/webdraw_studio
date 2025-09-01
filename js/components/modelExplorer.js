@@ -194,7 +194,7 @@ export async function init() {
     if (!panel) return;
     panel.classList.add('position-left');
     panel.innerHTML = `
-        <div class="panel-header"><h2>모델 탐색기</h2><button class="collapse-toggle"><</button></div>
+        <div class="panel-header"><h2 class="panel-title">모델 탐색기</h2><button class="collapse-toggle"></button></div>
         <div class="panel-content">
             <div class="tab-nav">
                 <button class="tab-btn active" data-tab="checkpoints">Checkpoints</button>

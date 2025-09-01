@@ -744,6 +744,15 @@ select:focus {
 #panel-area-capture .tool-group:last-child {
     margin-bottom: 0;
 }
+
+/* 영역 캡처 접기 상태 수정 - 높은 우선순위로 오버라이드 */
+#panel-area-capture.position-right.collapsed .panel-header {
+    padding: 0 !important;
+}
+
+#panel-area-capture.position-right.collapsed .panel-header .panel-title {
+    display: none !important;
+}
 #panel-multi-detailer {
     top: 200px;
     left: calc(100vw - 370px);
@@ -1110,6 +1119,15 @@ textarea:focus {
     font-size: 13px;
 }
 
+/* 모델 탐색기 접기 상태 수정 - 높은 우선순위로 오버라이드 */
+#panel-model-explorer.position-left.collapsed .panel-header {
+    padding: 0 !important;
+}
+
+#panel-model-explorer.position-left.collapsed .panel-header .panel-title {
+    display: none !important;
+}
+
 /* 콘텐츠 높이 조정 */
 #panel-model-explorer .panel-content {
     height: calc(100% - 36px);
@@ -1250,23 +1268,13 @@ textarea:focus {
 
 /* --- Collapse Fixes --- */
 
-/* Right Panel: Multi-Detailer */
-#panel-multi-detailer.collapsed {
-    width: 40px !important;
-    min-width: 40px !important;
-    overflow: hidden !important;
-}
-#panel-multi-detailer.collapsed .panel-header h2 {
-    display: none;
-}
-
-/* Bottom Panel: Prompt */
+/* Bottom Panel: Prompt (하단 패널은 별도 로직 유지) */
 #panel-prompt.collapsed {
-    height: 40px !important;
-    min-height: 40px !important;
+    height: 44px !important;
+    min-height: 44px !important;
     overflow: hidden !important;
 }
-#panel-prompt.collapsed .panel-header h2 {
+#panel-prompt.collapsed .panel-header .panel-title {
     display: none;
 }
 

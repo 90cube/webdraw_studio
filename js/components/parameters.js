@@ -24,7 +24,7 @@ const resolutionPresets = {
 
 function render() {
     return `
-        <div class="panel-header"><h2>파라미터</h2><button class="collapse-toggle"><</button></div>
+        <div class="panel-header"><h2 class="panel-title">파라미터</h2><button class="collapse-toggle"></button></div>
         <div class="panel-content">
             <div>모델 상태: <span id="model-status">[N/A]</span></div>
             <div class="tool-group">

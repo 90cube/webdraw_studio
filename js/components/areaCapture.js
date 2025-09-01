@@ -23,7 +23,7 @@ function roundToMultiple(value, multiple = 8) {
 
 function render() {
     return `
-        <div class="panel-header"><h2>영역 캡처</h2><button class="collapse-toggle">></button></div>
+        <div class="panel-header"><h2 class="panel-title">영역 캡처</h2><button class="collapse-toggle"></button></div>
         <div class="panel-content">
             <div class="tool-group tool-group-horizontal">
                 <button id="rectangle-tool" class="btn">영역 지정</button>

@@ -1,15 +1,12 @@
-/* Collapsible Panel Styles */
+/* Collapsible Panel Styles - 2단계 접기 로직 */
 .panel .panel-content {
     transition: all 0.3s ease-in-out;
     overflow: hidden;
 }
 
+/* 1단계: 콘텐츠 숨기기 - 높은 우선순위로 강제 적용 */
 .panel.collapsed .panel-content {
-    max-height: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    opacity: 0;
-    margin: 0;
+    display: none !important;
 }
 
 .panel .collapse-toggle {
@@ -37,29 +34,56 @@
     transform: scale(1.05);
 }
 
-/* Collapsed State Base */
-.panel.collapsed {
-    min-height: 44px;
-    height: 44px !important;
-    min-width: 44px;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 
-        0 4px 20px rgba(0, 0, 0, 0.3),
-        0 0 0 1px rgba(255, 255, 255, 0.05);
+/* 2단계: 패널 최소화 - 강제 적용 */
+.panel.position-left.collapsed,
+.panel.position-right.collapsed {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: 50px !important;
 }
 
-/* Directional Collapse */
-.panel.position-left.collapsed { 
-    transform: translateX(calc(-100% + 50px)) scale(0.9); 
+/* 좌측 패널 접기 - 왼쪽 끝으로 이동 */
+.panel.position-left.collapsed {
+    left: 20px !important;
+    right: auto !important;
 }
-.panel.position-right.collapsed { 
-    transform: translateX(calc(100% - 50px)) scale(0.9); 
+
+/* 우측 패널 접기 - 오른쪽 끝으로 이동 */
+.panel.position-right.collapsed {
+    right: 20px !important;
+    left: auto !important;
 }
-.panel.position-top.collapsed { 
-    transform: translateY(calc(-100% + 50px)) scale(0.9); 
+
+.panel.position-left.collapsed .panel-header .panel-title,
+.panel.position-right.collapsed .panel-header .panel-title {
+    display: none !important;
 }
-.panel.position-bottom.collapsed { 
-    transform: translateY(calc(100% - 50px)) scale(0.9); 
+
+.panel.position-left.collapsed .panel-header,
+.panel.position-right.collapsed .panel-header {
+    padding: 0 !important;
+}
+
+.panel.position-left.collapsed .collapse-toggle,
+.panel.position-right.collapsed .collapse-toggle {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 7px !important;
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+}
+
+/* 하단 패널은 별도 로직 - 강제 적용 */
+.panel.position-bottom.collapsed {
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    overflow: hidden !important;
+}
+
+.panel.position-bottom.collapsed .panel-header .panel-title {
+    display: none !important;
 }
 
 /* 플로팅 패널 호버 효과 */
