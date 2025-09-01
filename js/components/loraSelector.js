@@ -8,8 +8,8 @@ function buildTree(files) {
     const tree = {};
     files.forEach(file => {
         let currentLevel = tree;
-        const pathParts = file.subfolder.split(/[\/]/).filter(p => p);
-        
+        const pathParts = file.subfolder.split(/[\/]/).filter(p => p); // Using / and \ for cross-platform paths
+
         pathParts.forEach(part => {
             if (!currentLevel[part]) currentLevel[part] = {};
             currentLevel = currentLevel[part];
@@ -47,10 +47,47 @@ function renderTree(node, selectedPaths = []) {
     return html;
 }
 
-async function renderLoras() {
+function renderLoras(listToRender = fileList) {
     const selectedLoras = state.getState('selectedLoras') || [];
-    const tree = buildTree(fileList, selectedLoras);
-    panel.querySelector('.panel-content').innerHTML = renderTree(tree, selectedLoras);
+    const tree = buildTree(listToRender, selectedLoras);
+    const panelContent = panel.querySelector('.panel-content');
+    panelContent.innerHTML = renderTree(tree, selectedLoras);
+    addEventListenersToLoras(panelContent);
+}
+
+function addEventListenersToLoras(panelContent) {
+    // Add event listeners for file selection
+    panelContent.querySelectorAll('.file').forEach(fileElement => {
+        fileElement.addEventListener('click', (event) => {
+            const filePath = event.target.dataset.path;
+            let selectedLoras = state.getState('selectedLoras') || [];
+
+            if (selectedLoras.includes(filePath)) {
+                // Deselect
+                selectedLoras = selectedLoras.filter(path => path !== filePath);
+                event.target.classList.remove('selected');
+            } else {
+                // Select
+                selectedLoras.push(filePath);
+                event.target.classList.add('selected');
+            }
+            state.setState('selectedLoras', selectedLoras);
+        });
+    });
+
+    // Add event listeners for folder toggling
+    panelContent.querySelectorAll('.folder').forEach(folderElement => {
+        folderElement.addEventListener('click', (event) => {
+            const folderContent = event.target.nextElementSibling; // The ul.folder-content
+            if (folderContent) {
+                folderContent.classList.toggle('active');
+                const toggleArrow = event.target.querySelector('.toggle-arrow');
+                if (toggleArrow) {
+                    toggleArrow.textContent = folderContent.classList.contains('active') ? '▼' : '▶';
+                }
+            }
+        });
+    });
 }
 
 export async function init() {
@@ -66,9 +103,22 @@ export async function init() {
         }
         fileList = await response.json();
         await renderLoras();
+        matchPanelHeights(); // Call the new function here
         state.listen('selectedLoras', renderLoras);
     } catch (error) {
         console.error("Failed to fetch LoRAs:", error);
         panel.querySelector('.panel-content').innerHTML = `<p style="color: red;">LoRA를 불러오는 데 실패했습니다.</p>`;
+    }
+}
+
+function matchPanelHeights() {
+    const promptPanel = document.getElementById('panel-prompt');
+    const loraPanel = document.getElementById('panel-lora-selector');
+
+    if (promptPanel && loraPanel) {
+        const promptPanelHeight = promptPanel.offsetHeight;
+        loraPanel.style.height = `${promptPanelHeight}px`;
+        loraPanel.style.bottom = `20px`; // Align bottom with prompt panel
+        loraPanel.style.top = `auto`; // Remove top constraint
     }
 }

@@ -757,15 +757,13 @@ select:focus {
     top: 200px;
     left: calc(100vw - 370px);
     width: 350px;
-    height: 680px;
+    height: 650px;
 }
 
 /* 하단 초기 위치 */
 #panel-lora-selector {
-    top: calc(100vh - 220px);
     left: calc(100vw - 370px);
     width: 350px;
-    height: 200px;
 }
 
 #panel-lora-selector .panel-content {
