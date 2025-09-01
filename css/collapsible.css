@@ -9,6 +9,11 @@
     display: none !important;
 }
 
+/* 프롬프트 패널 예외 처리 - Generate 영역은 유지 */
+#panel-prompt.collapsed .panel-content {
+    display: flex !important;
+}
+
 .panel .collapse-toggle {
     position: absolute;
     top: 8px;
@@ -75,15 +80,28 @@
 }
 
 /* 하단 패널은 별도 로직 - 강제 적용 */
-.panel.position-bottom.collapsed {
+.panel.position-bottom.collapsed:not(#panel-prompt) {
     height: 44px !important;
     min-height: 44px !important;
     max-height: 44px !important;
     overflow: hidden !important;
 }
 
-.panel.position-bottom.collapsed .panel-header .panel-title {
+.panel.position-bottom.collapsed:not(#panel-prompt) .panel-header .panel-title {
     display: none !important;
+}
+
+/* 프롬프트 패널 전용 하단 접기 */
+#panel-prompt.collapsed {
+    height: 110px !important;
+    min-height: 110px !important;
+    max-height: 110px !important;
+    width: 250px !important;
+    min-width: 250px !important;
+    max-width: 250px !important;
+    overflow: visible !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
 }
 
 /* 플로팅 패널 호버 효과 */
