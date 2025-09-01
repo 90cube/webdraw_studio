@@ -1,4 +1,4 @@
-import state from '../core/stateManager.js';
+import state from '../core/stateManager.js?v=20250901';
 
 const panelId = 'panel-model-explorer';
 let panel;
@@ -173,7 +173,6 @@ function attachEventListeners() {
                 }
             }
             state.setState('currentBaseModel', baseModel);
-            console.log(`Selected checkpoint: ${e.target.dataset.path}, Base model set to: ${baseModel}`);
         }
         if (e.target.classList.contains('folder')) {
             const folderSpan = e.target;

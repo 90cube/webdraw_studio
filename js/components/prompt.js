@@ -1,4 +1,4 @@
-import state from '../core/stateManager.js';
+import state from '../core/stateManager.js?v=20250901';
 
 const panelId = 'panel-prompt';
 let panel;

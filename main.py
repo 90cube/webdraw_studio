@@ -65,12 +65,13 @@ def get_vaes() -> List[Dict[str, Any]]:
 
 @app.get("/api/models/loras")
 def get_loras() -> List[Dict[str, Any]]:
-    loras_dir = Path("models/lora")
+    loras_dir = Path("models/loras")
     allowed_extensions = [".safetensors", ".ckpt", ".pth"]
     loras = []
 
     for p in loras_dir.rglob("*"):
         if p.is_file() and p.suffix.lower() in allowed_extensions:
+            # Find a corresponding image file (png, jpg, etc.)
             image_path = next(p.parent.glob(f"{p.stem}.*['.png', '.jpg', '.jpeg', '.webp']"), None)
             
             loras.append({
@@ -120,3 +121,13 @@ def get_detection_models() -> List[str]:
             if p.is_file():
                 pt_files.append(p.name)
     return pt_files
+
+@app.get("/api/models/elements")
+def get_elements() -> List[str]:
+    elements_dir = Path("models/presets/elements")
+    elements = []
+    if elements_dir.exists() and elements_dir.is_dir():
+        for p in elements_dir.glob("*.png"):
+            if p.is_file():
+                elements.append(p.name)
+    return sorted(elements)

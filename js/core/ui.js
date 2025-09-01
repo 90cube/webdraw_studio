@@ -266,37 +266,10 @@ export function initCollapsiblePanels() {
         const button = e.target;
         const panel = button.closest('.panel');
         if (!panel) {
-            console.log('🚨 [DEBUG] No panel found for collapse button');
             return;
         }
 
-        console.log('🔄 [DEBUG] Collapse button clicked');
-        console.log('📋 [DEBUG] Panel ID:', panel.id);
-        console.log('📋 [DEBUG] Panel classes BEFORE:', Array.from(panel.classList));
-        
-        const wasCollapsed = panel.classList.contains('collapsed');
         panel.classList.toggle('collapsed');
-        const isNowCollapsed = panel.classList.contains('collapsed');
-        
-        console.log('📋 [DEBUG] Panel classes AFTER:', Array.from(panel.classList));
-        console.log('🔄 [DEBUG] Collapse state changed:', wasCollapsed, '→', isNowCollapsed);
-        
-        // CSS 스타일 적용 상태 확인
-        const computedStyle = window.getComputedStyle(panel);
-        console.log('🎨 [DEBUG] Panel computed width:', computedStyle.width);
-        console.log('🎨 [DEBUG] Panel computed height:', computedStyle.height);
-        
-        const panelContent = panel.querySelector('.panel-content');
-        if (panelContent) {
-            const contentStyle = window.getComputedStyle(panelContent);
-            console.log('🎨 [DEBUG] Content display:', contentStyle.display);
-        }
-        
-        const panelTitle = panel.querySelector('.panel-title');
-        if (panelTitle) {
-            const titleStyle = window.getComputedStyle(panelTitle);
-            console.log('🎨 [DEBUG] Title display:', titleStyle.display);
-        }
         
         // 아이콘 업데이트는 updateCollapseIcon 함수에서 처리
         updatePanelCollapseIcon(panel);
@@ -305,46 +278,31 @@ export function initCollapsiblePanels() {
     function updatePanelCollapseIcon(panel) {
         const collapseBtn = panel.querySelector('.collapse-toggle');
         if (!collapseBtn) {
-            console.log('🚨 [DEBUG] No collapse button found in panel:', panel.id);
             return;
         }
         
         let icons = ['−', '+']; // Default (center or top)
-        let position = 'center/top';
         
         if (panel.classList.contains('position-left')) {
             icons = ['<', '>'];
-            position = 'left';
         }
         if (panel.classList.contains('position-right')) {
             icons = ['>', '<'];
-            position = 'right';
         }
         if (panel.classList.contains('position-bottom')) {
             icons = ['v', '^'];
-            position = 'bottom';
         }
         
         const isCollapsed = panel.classList.contains('collapsed');
         const newIcon = isCollapsed ? icons[1] : icons[0];
         
-        console.log('🔄 [DEBUG] Updating icon for panel:', panel.id);
-        console.log('📍 [DEBUG] Panel position:', position);
-        console.log('🔄 [DEBUG] Is collapsed:', isCollapsed);
-        console.log('🎯 [DEBUG] Icon changed:', collapseBtn.textContent, '→', newIcon);
-        
         collapseBtn.textContent = newIcon;
     }
     
     // 초기 패널들의 아이콘 설정
-    console.log('🚀 [DEBUG] Initializing collapsible panels...');
     const panels = document.querySelectorAll('.panel');
-    console.log('📋 [DEBUG] Found', panels.length, 'panels');
     
     panels.forEach(panel => {
-        console.log('🏷️ [DEBUG] Initializing panel:', panel.id, 'with classes:', Array.from(panel.classList));
         updatePanelCollapseIcon(panel);
     });
-    
-    console.log('✅ [DEBUG] Collapsible panels initialization complete');
 }

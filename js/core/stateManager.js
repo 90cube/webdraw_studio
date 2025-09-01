@@ -22,7 +22,6 @@ const stateManager = {
         window.dispatchEvent(new CustomEvent('state:changed', {
             detail: { key, value }
         }));
-        console.log(`State changed: ${key} = ${value}`);
     },
 
     // 다른 모듈이 상태 변경을 구독할 수 있도록 리스너를 추가합니다.
