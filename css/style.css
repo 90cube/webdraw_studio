@@ -775,7 +775,7 @@ select:focus {
     overflow-y: auto;
 }
 #panel-prompt {
-    top: calc(100vh - 420px);
+    bottom: 20px; /* Keep the bottom fixed at 20px from the viewport bottom */
     left: calc(50vw - 410px);
     width: 820px;
     height: 400px;
